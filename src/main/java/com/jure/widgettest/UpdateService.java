@@ -70,7 +70,7 @@ public class UpdateService extends Service {
         SharedPreferences prefs;
         SharedPreferences.Editor editor;
         if (writer == null) {
-            prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            prefs = PreferenceManager.getDefaultSharedPreferences(context);
             editor = prefs.edit();
         } else {
             prefs = writer.sharedPreferences;
@@ -140,35 +140,14 @@ public class UpdateService extends Service {
         sendBroadcast(broadcastIntent);
     }
 
-
-    //int refreshSeconds = 60; // Should always be 60, set lower for faster refreshing when debugging
-    //private Handler handler = new Handler();
-
-    public void startTimer() {
-
-
-        //Log.i("Service", "Starting timer");
-
-        //schedule the handler, to wake up every 60 seconds
-        //handler.postDelayed(runnable, 1000 * refreshSeconds);
-    }
-/*
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            updateWidgets();
-            //handler.postDelayed(this, 1000 * refreshSeconds);
-        }
-    };
-*/
-
     void updateWidgets() {
         Log.i("Service", "Updating widgets (" + widgetData.size() + ")");
         for (int i = 0; i < widgetData.size(); i++) {
             WidgetData w = widgetData.get(i);
             if (w == null) continue;
+            Log.d("Update time for " + w.widgetID, "" + w.currentUpdateTime);
             if (w.currentUpdateTime == 0) {
-                Log.i("Updating", "ID: " + w.widgetID);
+                Log.i("Updating", "ID: " + w.widgetID + " with update interval " + w.updateInterval);
                 new RetrieveData().execute(w.widgetID + "", w.serverURL, w.Channel_ID, w.API_Key);
                 w.currentUpdateTime = w.updateInterval;
             }
@@ -177,6 +156,8 @@ public class UpdateService extends Service {
                 new RetrieveData().execute(w.widgetID + "", w.serverURL, w.Channel_ID, w.API_Key);
             }
             w.currentUpdateTime--;
+
+            saveWidgetData(null, w);
         }
     }
 

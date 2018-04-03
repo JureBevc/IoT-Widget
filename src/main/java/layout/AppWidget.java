@@ -55,6 +55,13 @@ public class AppWidget extends AppWidgetProvider {
                 PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.OpenAppButton, pIntent);
 
+        // Refresh button
+        Intent intent = new Intent(context, AppWidget.class);
+        intent.setAction("REFRESH " + appWidgetId);
+        PendingIntent refreshIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        views.setOnClickPendingIntent(R.id.main_content, refreshIntent);
+
+
         // Open App button on channel
         views.setOnClickPendingIntent(R.id.ChannelText, pIntent);
 
@@ -75,9 +82,9 @@ public class AppWidget extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
         //Log.e("onRecieve", "Widget got something " + intent.toString() + " " + intent.getAction());
-
+        String action = intent.getAction();
         // Update
-        if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
+        if (action.equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
                 if (!intent.hasExtra("checkTimeoutOfId")) {
@@ -102,6 +109,8 @@ public class AppWidget extends AppWidgetProvider {
                 }
 
             }
+        } else if (action.split(" ").length > 0 && action.split(" ")[0].equals("REFRESH")) {
+            UpdateService.currentService.
         }
     }
 

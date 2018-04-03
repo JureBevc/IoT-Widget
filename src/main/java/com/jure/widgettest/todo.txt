@@ -1,0 +1,1 @@
+Send widget data to widget update via intent extras.

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#1a1a1a</color>
+    <color name="colorPrimaryDark">#515151</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="dark_blue">#0d151e</color>
+    <color name="done_color">#c800346b</color>
+    <color name="appBackground">#efefe3</color>
+    <color name="fieldTextBackground">#96143362</color>
+    <color name="channelText">#ef8354</color>
+    <color name="background_field">#c8000000</color>
+    <color name="cancel_color">#c86b0c00</color>
+    <color name="spinner_color">#323c3c3c</color>
+    <color name="white">#FFFFFF</color>
+    <color name="red">#990000</color>
+</resources>

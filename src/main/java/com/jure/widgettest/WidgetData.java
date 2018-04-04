@@ -24,7 +24,10 @@ public class WidgetData {
 
     // Alert repetition
     public boolean repeatTimeout = false;
+    public boolean timeoutAlerted = false;
     public boolean repeatMeta = false;
+    public boolean metaAlerted = false;
+    public boolean[] boundsAlerted = new boolean[8];
     public boolean[] repeatBounds = new boolean[8];
 
 
@@ -48,6 +51,16 @@ public class WidgetData {
 
     public WidgetData() {
 
+    }
+
+    public void init(int widgetID, String serverURL, String Channel_ID, String API_Key, int updateInterval, int[] fieldsInOrder) {
+        this.widgetID = widgetID;
+        this.Channel_ID = Channel_ID;
+        this.API_Key = API_Key;
+        this.serverURL = serverURL;
+        this.updateInterval = updateInterval;
+        currentUpdateTime = updateInterval - 1;
+        this.fieldsInOrder = fieldsInOrder;
     }
 
     public void setUpperBound(boolean[] alerts, double[] values) {
@@ -100,6 +113,16 @@ public class WidgetData {
         }
     }
 
+    public void setBoundsAlerted(String s) {
+        String[] spl = s.split(",");
+        for (int i = 0; i < spl.length; i++) {
+            try {
+                boundsAlerted[i] = Boolean.parseBoolean(spl[i]);
+            } catch (Exception e) {
+            }
+        }
+    }
+
     public void setBounds(String upperAlert, String lowerAlert, String upper, String lower) {
         String[] uas = upperAlert.split(",");
         String[] las = lowerAlert.split(",");
@@ -132,6 +155,10 @@ public class WidgetData {
         }
     }
 
+    public void setBoundsRepeat(boolean[] alertRepeat) {
+        repeatBounds = alertRepeat.clone();
+    }
+
     public String formatDecimals() {
         String r = "";
         for (int i : decimalPlaces) {
@@ -143,6 +170,14 @@ public class WidgetData {
     public String formatRepeatBounds() {
         String r = "";
         for (boolean b : repeatBounds) {
+            r += b + ",";
+        }
+        return r;
+    }
+
+    public String formatBoundsAlerted() {
+        String r = "";
+        for (boolean b : boundsAlerted) {
             r += b + ",";
         }
         return r;
@@ -187,5 +222,6 @@ public class WidgetData {
         }
         return r;
     }
+
 
 }

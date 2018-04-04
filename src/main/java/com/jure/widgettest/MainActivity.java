@@ -54,10 +54,14 @@ public class MainActivity extends Activity {
     String[] empty = {"", "", "", "", "", "", "", ""};
 
     boolean timeoutAlert = false;
+    boolean timeoutRepeat = false;
     int timeoutAlertMinutes = 0;
 
     boolean metaAlert = false;
+    boolean metaRepeat = false;
     String metaAlertString = "";
+
+    boolean[] alertRepeat = new boolean[8];
 
     WidgetData currentWidgetData;
 
@@ -68,21 +72,22 @@ public class MainActivity extends Activity {
         writer = new DataWriter(this);
         updateService = new UpdateService(this);
         getIdOfCurrentWidget(savedInstanceState);
-        currentWidgetData = updateService.addWidget(writer, id, serverURL, Channel_ID, API_Key, updateInterval, getFields());
-        setWidgetOptions();
+        currentWidgetData = updateService.widgetDataFromPreferences(writer.sharedPreferences, id);
         seekBarListener();
         timeoutListener();
         metaListener();
+        repeatListener();
         channelInputListener();
         apiInputListener();
         serverInputListener();
         fieldListSelectionListener();
         doneButtonListener();
         cancelButtonListener();
+        setWidgetOptions();
     }
 
     void setWidgetOptions() {
-        WidgetData w = updateService.getWidgetData(id);
+        WidgetData w = currentWidgetData;
         if (w != null) {
             Channel_ID = w.Channel_ID;
             final EditText channelInput = findViewById(R.id.ChannelID);
@@ -92,7 +97,25 @@ public class MainActivity extends Activity {
             final EditText apiInput = findViewById(R.id.APIKey);
             apiInput.setText(w.API_Key);
 
-            setData();
+            final SeekBar updateIntervalBar = findViewById(R.id.UpdateTimeBar);
+            updateIntervalBar.setProgress(w.updateInterval - 1);
+
+            final Switch timeoutAlert = findViewById(R.id.timeoutAlertSwitch);
+            timeoutAlert.setChecked(w.timeoutAlert);
+            final Switch timeoutAlertRepeat = findViewById(R.id.repeatTimeoutAlert);
+            timeoutAlertRepeat.setChecked(w.repeatTimeout);
+            final SeekBar timeoutAlertDelay = findViewById(R.id.timoutSeeker);
+            timeoutAlertDelay.setProgress(w.timeoutAlertThreshold);
+
+            final Switch metaAlert = findViewById(R.id.metaAlertSwitch);
+            metaAlert.setChecked(w.metaAlert);
+            final Switch repeatMeta = findViewById(R.id.repeatMetaAlert);
+            repeatMeta.setChecked(w.repeatMeta);
+            final EditText metaString = findViewById(R.id.metaAlertInput);
+            metaString.setText(w.metaAlertString);
+
+
+            //setData();
         }
     }
 
@@ -124,6 +147,18 @@ public class MainActivity extends Activity {
             }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
+
+        // Repeat
+        final Switch metaAlertRepeat = findViewById(R.id.repeatMetaAlert);
+        metaAlertRepeat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    metaRepeat = true;
+                } else {
+                    metaRepeat = false;
+                }
             }
         });
     }
@@ -166,6 +201,44 @@ public class MainActivity extends Activity {
 
             }
         });
+
+        // Repeat
+        final Switch timeoutAlertRepeat = findViewById(R.id.repeatTimeoutAlert);
+        timeoutAlertRepeat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    timeoutRepeat = true;
+                } else {
+                    timeoutRepeat = false;
+                }
+            }
+        });
+    }
+
+    void repeatListener() {
+        // Switches
+        final Switch[] repeatSwitches = {
+                findViewById(R.id.boundsRepeat1),
+                findViewById(R.id.boundsRepeat2),
+                findViewById(R.id.boundsRepeat3),
+                findViewById(R.id.boundsRepeat4),
+                findViewById(R.id.boundsRepeat5),
+                findViewById(R.id.boundsRepeat6),
+                findViewById(R.id.boundsRepeat7),
+                findViewById(R.id.boundsRepeat8)
+        };
+        for (int i = 0; i < 8; i++) {
+            final int index = i;
+            repeatSwitches[i].setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        alertRepeat[index] = true;
+                    } else {
+                        alertRepeat[index] = false;
+                    }
+                }
+            });
+        }
     }
 
     void fieldListSelectionListener() {
@@ -409,6 +482,8 @@ public class MainActivity extends Activity {
     double[] lowerBoundValue = new double[8];
     double[] upperBoundValue = new double[8];
 
+    boolean[] repeat = new boolean[8];
+
     public void setAlerts() {
         Spinner[] spinners = new Spinner[]{
                 findViewById(R.id.spinner1),
@@ -458,12 +533,16 @@ public class MainActivity extends Activity {
             }
         }
 
-        WidgetData w = updateService.getWidgetData(id);
+        WidgetData w = currentWidgetData;
         if (w != null) {
+            Log.e("DATA", "DATA");
             w.setLowerBound(lowerBoundSet.clone(), lowerBoundValue.clone());
             w.setUpperBound(upperBoundSet.clone(), upperBoundValue.clone());
             w.setTimeoutAlert(timeoutAlert, timeoutAlertMinutes);
             w.setMetaAlert(metaAlert, metaAlertString);
+            w.setBoundsRepeat(alertRepeat);
+            w.repeatTimeout = timeoutRepeat;
+            w.repeatMeta = metaRepeat;
         }
     }
 
@@ -502,7 +581,7 @@ public class MainActivity extends Activity {
             }
         }
 
-        WidgetData w = updateService.getWidgetData(id);
+        WidgetData w = currentWidgetData;
         if (w != null) {
             w.setDecimalPlaces(decimals);
         }
@@ -510,22 +589,13 @@ public class MainActivity extends Activity {
 
 
     void setRepeating() {
-        updateService.addWidget(writer, id, serverURL, Channel_ID, API_Key, updateInterval, getFields());
-
+        updateService.addWidget(writer, currentWidgetData);
+        updateService.saveWidgetData(writer, currentWidgetData, true);
         final AlarmManager manager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         serviceIntent = new Intent(this, UpdateService.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, serviceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 60000, pendingIntent);
-
-        /*
-        updateService = new UpdateService(this);
-        serviceIntent = new Intent(this, UpdateService.class);
-        if (!isMyServiceRunning(updateService.getClass())) {
-            Log.e("MainAct", "Starting service");
-            startService(serviceIntent);
-        }
-        */
     }
 
     @Override
@@ -535,24 +605,15 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     void sendToWidget() {
+        currentWidgetData.init(id, serverURL, Channel_ID, API_Key, updateInterval, getFields());
         if (updateData.equals("netFail")) {
-            WidgetData w = updateService.getWidgetData(id);
+            WidgetData w = currentWidgetData;
             if (w != null) {
                 w.netFail = true;
             }
         } else {
+            Log.e("Widget update", "Application call.");
             Intent intent = new Intent(this, AppWidget.class);
             intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 

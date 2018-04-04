@@ -41,29 +41,21 @@ public class UpdateService extends Service {
         currentService = this;
     }
 
-    public WidgetData addWidget(DataWriter writer, int id, String serverURL, String Channel_ID, String API_Key, int updateInterval, int[] fieldsInOrder) {
-        boolean found = false;
+    public WidgetData addWidget(DataWriter writer, WidgetData widget) {
+
         for (int i = 0; i < widgetData.size(); i++) {
             WidgetData w = widgetData.get(i);
             if (w == null) continue;
-            if (w.widgetID == id) {
-                found = true;
-                w.serverURL = serverURL;
-                w.Channel_ID = Channel_ID;
-                w.API_Key = API_Key;
-                w.updateInterval = updateInterval;
-                w.fieldsInOrder = fieldsInOrder;
-                saveWidgetData(writer, w);
+            if (w.widgetID == widget.widgetID) {
+                w = widget;
+                saveWidgetData(writer, w, true);
                 return w;
             }
         }
 
-        if (!found) {
-            widgetData.add(new WidgetData(id, serverURL, Channel_ID, API_Key, updateInterval, fieldsInOrder));
-            saveWidgetData(writer, widgetData.getLast());
-            return widgetData.getLast();
-        }
-        return null;
+        widgetData.add(widget);
+        saveWidgetData(writer, widgetData.getLast(), true);
+        return widgetData.getLast();
     }
 
     public void removeWidget(DataWriter writer, Context context, int id) {
@@ -145,7 +137,6 @@ public class UpdateService extends Service {
         for (int i = 0; i < widgetData.size(); i++) {
             WidgetData w = widgetData.get(i);
             if (w == null) continue;
-            Log.d("Update time for " + w.widgetID, "" + w.currentUpdateTime);
             if (w.currentUpdateTime == 0) {
                 Log.i("Updating", "ID: " + w.widgetID + " with update interval " + w.updateInterval);
                 new RetrieveData().execute(w.widgetID + "", w.serverURL, w.Channel_ID, w.API_Key);
@@ -156,8 +147,6 @@ public class UpdateService extends Service {
                 new RetrieveData().execute(w.widgetID + "", w.serverURL, w.Channel_ID, w.API_Key);
             }
             w.currentUpdateTime--;
-
-            saveWidgetData(null, w);
         }
     }
 
@@ -200,6 +189,7 @@ public class UpdateService extends Service {
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
             sendBroadcast(intent);
         }
+        saveWidgetData(null, w, !data.equals("netFail"));
     }
 
     void loadWidgetData(DataWriter writer) {
@@ -227,10 +217,10 @@ public class UpdateService extends Service {
         WidgetData w = new WidgetData();
         w.widgetID = widgetID;
 
-        w.Channel_ID = prefs.getString("channel_" + w.widgetID, "--");
-        w.API_Key = prefs.getString("api_" + w.widgetID, "--");
-        w.serverURL = prefs.getString("server_" + w.widgetID, "--");
-        w.ChannelName = prefs.getString("name_" + w.widgetID, "--");
+        w.Channel_ID = prefs.getString("channel_" + w.widgetID, "");
+        w.API_Key = prefs.getString("api_" + w.widgetID, "");
+        w.serverURL = prefs.getString("server_" + w.widgetID, "");
+        w.ChannelName = prefs.getString("name_" + w.widgetID, "");
 
         w.updateInterval = prefs.getInt("updateInterval_" + w.widgetID, 0);
         w.currentUpdateTime = prefs.getInt("currentUpdateTime_" + w.widgetID, 0);
@@ -242,11 +232,14 @@ public class UpdateService extends Service {
         w.timeoutAlertThreshold = prefs.getInt("timeoutAlertThreshold_" + w.widgetID, 0);
 
         w.metaAlert = prefs.getBoolean("metaAlert_" + w.widgetID, false);
-        w.metaAlertString = prefs.getString("metaAlertString_" + w.widgetID, "--");
+        w.metaAlertString = prefs.getString("metaAlertString_" + w.widgetID, "");
 
         w.repeatTimeout = prefs.getBoolean("repeatTimeout_" + w.widgetID, false);
+        w.timeoutAlerted = prefs.getBoolean("timeoutAlerted_" + w.widgetID, false);
         w.repeatMeta = prefs.getBoolean("repeatMeta_" + w.widgetID, false);
+        w.metaAlerted = prefs.getBoolean("metaAlerted_" + w.widgetID, false);
         w.setRepeatBounds(prefs.getString("repeatBounds_" + w.widgetID, ""));
+        w.setBoundsAlerted(prefs.getString("boundsAlerted_" + w.widgetID, ""));
 
 
         w.setBounds(prefs.getString("upperBoundAlert_" + w.widgetID, ""),
@@ -258,7 +251,7 @@ public class UpdateService extends Service {
         return w;
     }
 
-    void saveWidgetData(DataWriter writer, WidgetData w) {
+    void saveWidgetData(DataWriter writer, WidgetData w, boolean allData) {
         SharedPreferences prefs;
         SharedPreferences.Editor editor;
         if (writer == null) {
@@ -273,12 +266,12 @@ public class UpdateService extends Service {
         if (!exists) {
             editor.putString("all_ids", all_ids + w.widgetID + ",");
         }
-
-        editor.putString("channel_" + w.widgetID, w.Channel_ID);
-        editor.putString("api_" + w.widgetID, w.API_Key);
-        editor.putString("server_" + w.widgetID, w.serverURL);
-        editor.putString("name_" + w.widgetID, w.ChannelName);
-
+        if (allData) {
+            editor.putString("channel_" + w.widgetID, w.Channel_ID);
+            editor.putString("api_" + w.widgetID, w.API_Key);
+            editor.putString("server_" + w.widgetID, w.serverURL);
+            editor.putString("name_" + w.widgetID, w.ChannelName);
+        }
         editor.putInt("updateInterval_" + w.widgetID, w.updateInterval);
         editor.putInt("currentUpdateTime_" + w.widgetID, w.currentUpdateTime);
         editor.putString("decimalPlaces_" + w.widgetID, w.formatDecimals());
@@ -292,8 +285,11 @@ public class UpdateService extends Service {
         editor.putString("metaAlertString_" + w.widgetID, w.metaAlertString);
 
         editor.putBoolean("repeatTimeout_" + w.widgetID, w.repeatTimeout);
+        editor.putBoolean("timeoutAlerted_" + w.widgetID, w.timeoutAlerted);
         editor.putBoolean("repeatMeta_" + w.widgetID, w.repeatMeta);
+        editor.putBoolean("metaAlerted_" + w.widgetID, w.metaAlerted);
         editor.putString("repeatBounds_" + w.widgetID, w.formatRepeatBounds());
+        editor.putString("boundsAlerted_" + w.widgetID, w.formatBoundsAlerted());
 
         editor.putString("upperBoundAlert_" + w.widgetID, w.formatUpperBoundAlert());
         editor.putString("lowerBoundAlert_" + w.widgetID, w.formatLowerBoundAlert());
@@ -327,7 +323,6 @@ public class UpdateService extends Service {
                 con.setRequestMethod("GET");
 
                 //int code = con.getResponseCode();
-                // Log
                 //System.out.println("GET request: " + urlString);
                 //System.out.println("Response code: " + code);
 

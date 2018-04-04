@@ -12,6 +12,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.jure.widgettest.DataWriter;
 import com.jure.widgettest.MainActivity;
 import com.jure.widgettest.R;
 import com.jure.widgettest.UpdateService;
@@ -110,19 +111,26 @@ public class AppWidget extends AppWidgetProvider {
 
             }
         } else if (action.split(" ").length > 0 && action.split(" ")[0].equals("REFRESH")) {
-            UpdateService.currentService.
+
         }
     }
 
-
     static void updateWidgetData(Context context, RemoteViews remoteViews, String updateData) {
         WidgetData w = UpdateService.currentService.getWidgetData(updateID);
-
+        Log.e("IS NULL", "IS NULL " + (w == null) + " checkTimeout " + checkTimeout);
         // Check for timeout
         if (checkTimeout) {
-            if (w != null && w.timeoutAlert && w.timeoutTries - 1 >= w.timeoutAlertThreshold) {
+            if (w != null && w.timeoutAlert && w.timeoutTries - 1 >= w.timeoutAlertThreshold && (!w.timeoutAlerted || w.repeatTimeout)) {
+                w.timeoutAlerted = true;
                 sendNotification(context, "Timeout alert. Could not fetch data.", w.ChannelName);
                 setAllColor(remoteViews, Color.parseColor("#FF2222"));
+            } else if (w != null && !w.timeoutAlert) {
+                w.timeoutAlerted = false;
+            }
+            // Write widget data
+            if (w != null) {
+                DataWriter dw = new DataWriter(context);
+                dw.saveWidgetData(w, true);
             }
             return;
         }
@@ -137,7 +145,8 @@ public class AppWidget extends AppWidgetProvider {
         UpdateService.currentService.setWidgetData(updateID, updateData, fieldValues);
 
         // Check for meta data alert
-        if (w.metaAlert)
+        if (w != null && w.metaAlert && (!w.metaAlerted || w.repeatMeta)) {
+            w.metaAlerted = true;
             try {
                 String metaData = new JSONObject(updateData).getJSONObject("channel").getString("metadata");
                 if (metaData.contains(w.metaAlertString)) {
@@ -146,6 +155,9 @@ public class AppWidget extends AppWidgetProvider {
             } catch (Exception e) {
                 // Error getting meta data
             }
+        } else if (w != null && !w.metaAlert) {
+            w.metaAlerted = false;
+        }
 
         // Set data
         // Change channel name
@@ -161,10 +173,6 @@ public class AppWidget extends AppWidgetProvider {
         int[] fieldValueTexts = {R.id.Field1, R.id.Field2, R.id.Field3, R.id.Field4, R.id.Field5, R.id.Field6, R.id.Field7, R.id.Field8};
         int nextField = 0;
         for (int i = 0; i < 8; i++) {
-            if (w == null) {
-                Log.e("ERROR", "Could not get widgetData object of this widget.");
-                break;
-            }
             if (w.fieldsInOrder[i] != -1) {
                 remoteViews.setTextViewText(fieldNameTexts[nextField], fieldNames[w.fieldsInOrder[i] - 1]);
 
@@ -174,17 +182,21 @@ public class AppWidget extends AppWidgetProvider {
                 } else {
                     remoteViews.setTextViewText(fieldValueTexts[nextField], fieldValues[w.fieldsInOrder[i] - 1]);
                 }
-
+                Log.e("asd " + i, " " + fieldValues[w.fieldsInOrder[i] - 1]);
 
                 int b = isOutOfBounds(w, fieldValues[w.fieldsInOrder[i] - 1], i);
                 if (b != 0) {
-                    remoteViews.setTextColor(fieldNameTexts[nextField], Color.parseColor("#FF2222"));
-                    remoteViews.setTextColor(fieldValueTexts[nextField], Color.parseColor("#FF2222"));
-                    if (b > 0)
-                        sendNotification(context, fieldNames[w.fieldsInOrder[i] - 1] + ": Upper threshold exceeded!", w.ChannelName);
-                    if (b < 0)
-                        sendNotification(context, fieldNames[w.fieldsInOrder[i] - 1] + ": Lower threshold exceeded!", w.ChannelName);
+                    if (!w.boundsAlerted[i] || w.repeatBounds[i]) {
+                        w.boundsAlerted[i] = true;
+                        remoteViews.setTextColor(fieldNameTexts[nextField], Color.parseColor("#FF2222"));
+                        remoteViews.setTextColor(fieldValueTexts[nextField], Color.parseColor("#FF2222"));
+                        if (b > 0)
+                            sendNotification(context, fieldNames[w.fieldsInOrder[i] - 1] + ": Upper threshold exceeded!", w.ChannelName);
+                        if (b < 0)
+                            sendNotification(context, fieldNames[w.fieldsInOrder[i] - 1] + ": Lower threshold exceeded!", w.ChannelName);
+                    }
                 } else {
+                    w.boundsAlerted[i] = false;
                     remoteViews.setTextColor(fieldNameTexts[nextField], Color.parseColor("#FFFFFF"));
                     remoteViews.setTextColor(fieldValueTexts[nextField], Color.parseColor("#FFFFFF"));
                 }
@@ -201,6 +213,12 @@ public class AppWidget extends AppWidgetProvider {
         SimpleDateFormat sdf = new SimpleDateFormat("MMM d. HH:mm");
         remoteViews.setTextViewText(R.id.DateAndTimeText, sdf.format(Calendar.getInstance().getTime()));
         updateID = AppWidgetManager.INVALID_APPWIDGET_ID;
+
+        // Write widget data
+        if (w != null) {
+            DataWriter dw = new DataWriter(context);
+            dw.saveWidgetData(w, true);
+        }
     }
 
     static void processData(Context context, String updateData, String[] fieldNames, String[] fieldValues) {
@@ -295,7 +313,8 @@ public class AppWidget extends AppWidgetProvider {
 
         // Remove all deleted widgets
         for (int id : appWidgetIds) {
-            UpdateService.currentService.removeWidget(null, context, id);
+            DataWriter dw = new DataWriter(context, id);
+            //UpdateService.currentService.removeWidget(null, context, id);
         }
     }
 

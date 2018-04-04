@@ -1,1 +1,2 @@
-Send widget data to widget update via intent extras.
+Load previously entered widget data when opening widget.
+Add graphs.

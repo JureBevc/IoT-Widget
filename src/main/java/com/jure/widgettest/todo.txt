@@ -1,2 +1,2 @@
-Load previously entered widget data when opening widget.
-Add graphs.
+Manual refresh.
+Graphs.

@@ -11,6 +11,8 @@
         android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:background="@android:color/transparent"
         android:orientation="vertical">
 
@@ -558,5 +560,14 @@
         android:textAlignment="center"
         android:textColor="@android:color/background_light"
         android:textStyle="italic"/>
+
+    <ProgressBar
+        android:id="@+id/loadingCircle"
+        style="@android:style/Widget.ProgressBar"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"/>
 
 </RelativeLayout>

@@ -121,7 +121,12 @@ public class UpdateService extends Service {
         super.onStartCommand(intent, flags, startId);
         Log.e("Service", "ON START");
         loadWidgetData(null);
-        updateWidgets();
+
+        if (intent != null && intent.getAction() != null && intent.getAction().equals("ManualUpdate")) {
+            manualUpdate(intent.getExtras().getInt("WidgetID"));
+        } else {
+            updateWidgets();
+        }
         return START_STICKY;
     }
 
@@ -132,6 +137,17 @@ public class UpdateService extends Service {
         sendBroadcast(broadcastIntent);
     }
 
+    void manualUpdate(int widgetID) {
+        Log.i("Service", "Manual update (" + widgetData.size() + ")");
+        for (int i = 0; i < widgetData.size(); i++) {
+            WidgetData w = widgetData.get(i);
+            if (w == null || w.widgetID != widgetID) continue;
+            Log.i("Updating", "ID: " + w.widgetID + " with update interval " + w.updateInterval);
+            new RetrieveData().execute(w.widgetID + "", w.serverURL, w.Channel_ID, w.API_Key, "true");
+            break;
+        }
+    }
+
     void updateWidgets() {
         Log.i("Service", "Updating widgets (" + widgetData.size() + ")");
         for (int i = 0; i < widgetData.size(); i++) {
@@ -139,12 +155,12 @@ public class UpdateService extends Service {
             if (w == null) continue;
             if (w.currentUpdateTime == 0) {
                 Log.i("Updating", "ID: " + w.widgetID + " with update interval " + w.updateInterval);
-                new RetrieveData().execute(w.widgetID + "", w.serverURL, w.Channel_ID, w.API_Key);
+                new RetrieveData().execute(w.widgetID + "", w.serverURL, w.Channel_ID, w.API_Key, "false");
                 w.currentUpdateTime = w.updateInterval;
             }
             if (w.netFail) {
                 Log.i("Updating a failed", "ID: " + w.widgetID);
-                new RetrieveData().execute(w.widgetID + "", w.serverURL, w.Channel_ID, w.API_Key);
+                new RetrieveData().execute(w.widgetID + "", w.serverURL, w.Channel_ID, w.API_Key, "false");
             }
             w.currentUpdateTime--;
         }
@@ -157,9 +173,9 @@ public class UpdateService extends Service {
     }
 
 
-    void sendToWidget(int id, String serverURL, String Channel_ID, String API_Key, String data) {
+    void sendToWidget(int id, String serverURL, String Channel_ID, String API_Key, String data, boolean isManual) {
         WidgetData w = getWidgetData(id);
-        if (data.equals("netFail")) {
+        if (data.equals("netFail") && !isManual) {
             if (w != null) {
                 w.netFail = true;
                 w.timeoutTries++;
@@ -171,7 +187,7 @@ public class UpdateService extends Service {
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
             sendBroadcast(intent);
         } else {
-            if (w != null) {
+            if (w != null && !isManual) {
                 w.netFail = false;
                 w.timeoutTries = 0;
             }
@@ -306,6 +322,7 @@ public class UpdateService extends Service {
 
         String ret, serverURL, Channel_ID, API_Key;
         int id;
+        boolean isManual = false;
 
         @Override
         protected String doInBackground(String... strings) {
@@ -315,6 +332,7 @@ public class UpdateService extends Service {
                 serverURL = strings[1];
                 Channel_ID = strings[2];
                 API_Key = strings[3];
+                isManual = Boolean.parseBoolean(strings[4]);
                 String urlString = serverURL + "/channels/" + Channel_ID + "/feed.json?metadata=true&api_key=" + API_Key;
                 //Log.e("Getting widget data", urlString);
 
@@ -346,7 +364,7 @@ public class UpdateService extends Service {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             try {
-                sendToWidget(id, serverURL, Channel_ID, API_Key, ret);
+                sendToWidget(id, serverURL, Channel_ID, API_Key, ret, isManual);
             } catch (Exception e) {
                 e.printStackTrace();
             }

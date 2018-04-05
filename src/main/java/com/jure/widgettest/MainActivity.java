@@ -73,6 +73,9 @@ public class MainActivity extends Activity {
         updateService = new UpdateService(this);
         getIdOfCurrentWidget(savedInstanceState);
         currentWidgetData = updateService.widgetDataFromPreferences(writer.sharedPreferences, id);
+        // Set default URL
+        if (currentWidgetData.serverURL.isEmpty())
+            currentWidgetData.serverURL = serverURL;
         seekBarListener();
         timeoutListener();
         metaListener();
@@ -114,7 +117,72 @@ public class MainActivity extends Activity {
             final EditText metaString = findViewById(R.id.metaAlertInput);
             metaString.setText(w.metaAlertString);
 
+            final EditText serverURL = findViewById(R.id.serverURLInput);
+            serverURL.setText(w.serverURL);
 
+            // Field data
+            Spinner[] spinners = new Spinner[]{
+                    findViewById(R.id.spinner1),
+                    findViewById(R.id.spinner2),
+                    findViewById(R.id.spinner3),
+                    findViewById(R.id.spinner4),
+                    findViewById(R.id.spinner5),
+                    findViewById(R.id.spinner6),
+                    findViewById(R.id.spinner7),
+                    findViewById(R.id.spinner8)
+            };
+            EditText[] upperText = new EditText[]{
+                    findViewById(R.id.upperAlert1),
+                    findViewById(R.id.upperAlert2),
+                    findViewById(R.id.upperAlert3),
+                    findViewById(R.id.upperAlert4),
+                    findViewById(R.id.upperAlert5),
+                    findViewById(R.id.upperAlert6),
+                    findViewById(R.id.upperAlert7),
+                    findViewById(R.id.upperAlert8)
+            };
+            EditText[] lowerText = new EditText[]{
+                    findViewById(R.id.lowerAlert1),
+                    findViewById(R.id.lowerAlert2),
+                    findViewById(R.id.lowerAlert3),
+                    findViewById(R.id.lowerAlert4),
+                    findViewById(R.id.lowerAlert5),
+                    findViewById(R.id.lowerAlert6),
+                    findViewById(R.id.lowerAlert7),
+                    findViewById(R.id.lowerAlert8)
+            };
+            final Switch[] repeatSwitches = {
+                    findViewById(R.id.boundsRepeat1),
+                    findViewById(R.id.boundsRepeat2),
+                    findViewById(R.id.boundsRepeat3),
+                    findViewById(R.id.boundsRepeat4),
+                    findViewById(R.id.boundsRepeat5),
+                    findViewById(R.id.boundsRepeat6),
+                    findViewById(R.id.boundsRepeat7),
+                    findViewById(R.id.boundsRepeat8)
+            };
+            EditText[] decimalText = new EditText[]{
+                    findViewById(R.id.decimalPlaces1),
+                    findViewById(R.id.decimalPlaces2),
+                    findViewById(R.id.decimalPlaces3),
+                    findViewById(R.id.decimalPlaces4),
+                    findViewById(R.id.decimalPlaces5),
+                    findViewById(R.id.decimalPlaces6),
+                    findViewById(R.id.decimalPlaces7),
+                    findViewById(R.id.decimalPlaces8)
+            };
+
+            for (int i = 0; i < 8; i++) {
+                int selection = (w.fieldsInOrder[i] >= 0) ? w.fieldsInOrder[i] : 0;
+                spinners[i].setSelection(selection);
+                if (w.upperBoundAlert[i])
+                    upperText[i].setText(w.upperBound[i] + "");
+                if (w.lowerBoundAlert[i])
+                    lowerText[i].setText(w.lowerBound[i] + "");
+                if (w.decimalPlaces[i] >= 0)
+                    decimalText[i].setText(w.decimalPlaces[i] + "");
+                repeatSwitches[i].setChecked(w.repeatBounds[i]);
+            }
             //setData();
         }
     }
@@ -349,7 +417,7 @@ public class MainActivity extends Activity {
     }
 
     public void serverInputListener() {
-        final EditText serverInput = findViewById(R.id.serverURL);
+        final EditText serverInput = findViewById(R.id.serverURLInput);
         serverInput.addTextChangedListener(new TextWatcher() {
 
             public void afterTextChanged(Editable s) {
@@ -448,7 +516,9 @@ public class MainActivity extends Activity {
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         for (Spinner s : spinners) {
             if (s != null) {
+                int selected = s.getSelectedItemPosition();
                 s.setAdapter(spinnerArrayAdapter);
+                s.setSelection(selected);
             }
         }
 

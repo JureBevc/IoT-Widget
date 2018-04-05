@@ -7,9 +7,11 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import com.jure.widgettest.DataWriter;
@@ -58,10 +60,10 @@ public class AppWidget extends AppWidgetProvider {
 
         // Refresh button
         Intent intent = new Intent(context, AppWidget.class);
-        intent.setAction("REFRESH " + appWidgetId);
+        intent.setAction("ManualUpdate");
+        intent.putExtra("WidgetID", appWidgetId);
         PendingIntent refreshIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-        views.setOnClickPendingIntent(R.id.main_content, refreshIntent);
-
+        views.setOnClickPendingIntent(R.id.DateAndTimeText, refreshIntent);
 
         // Open App button on channel
         views.setOnClickPendingIntent(R.id.ChannelText, pIntent);
@@ -110,14 +112,18 @@ public class AppWidget extends AppWidgetProvider {
                 }
 
             }
-        } else if (action.split(" ").length > 0 && action.split(" ")[0].equals("REFRESH")) {
-
+        } else if (action.equals("ManualUpdate")) {
+            Intent serviceIntent = new Intent(context, UpdateService.class);
+            serviceIntent.setAction("ManualUpdate");
+            serviceIntent.putExtra("WidgetID", intent.getExtras().getInt("WidgetID"));
+            context.startService(serviceIntent);
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget);
+            views.setViewVisibility(R.id.loadingCircle, View.VISIBLE);
         }
     }
 
     static void updateWidgetData(Context context, RemoteViews remoteViews, String updateData) {
         WidgetData w = UpdateService.currentService.getWidgetData(updateID);
-        Log.e("IS NULL", "IS NULL " + (w == null) + " checkTimeout " + checkTimeout);
         // Check for timeout
         if (checkTimeout) {
             if (w != null && w.timeoutAlert && w.timeoutTries - 1 >= w.timeoutAlertThreshold && (!w.timeoutAlerted || w.repeatTimeout)) {
@@ -135,6 +141,9 @@ public class AppWidget extends AppWidgetProvider {
             return;
         }
         setAllColor(remoteViews, Color.WHITE);
+        // Loading circle
+        Log.e("DATA", updateData);
+        //remoteViews.setViewVisibility(R.id.loadingCircle, View.GONE);
 
         // Update widgetData object
 
@@ -182,7 +191,6 @@ public class AppWidget extends AppWidgetProvider {
                 } else {
                     remoteViews.setTextViewText(fieldValueTexts[nextField], fieldValues[w.fieldsInOrder[i] - 1]);
                 }
-                Log.e("asd " + i, " " + fieldValues[w.fieldsInOrder[i] - 1]);
 
                 int b = isOutOfBounds(w, fieldValues[w.fieldsInOrder[i] - 1], i);
                 if (b != 0) {

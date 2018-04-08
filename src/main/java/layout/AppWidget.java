@@ -7,7 +7,6 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -86,6 +85,7 @@ public class AppWidget extends AppWidgetProvider {
         super.onReceive(context, intent);
         //Log.e("onRecieve", "Widget got something " + intent.toString() + " " + intent.getAction());
         String action = intent.getAction();
+        Log.e("RECIEVED INTENT", "ACTION: " + action);
         // Update
         if (action.equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
             Bundle extras = intent.getExtras();
@@ -113,17 +113,26 @@ public class AppWidget extends AppWidgetProvider {
 
             }
         } else if (action.equals("ManualUpdate")) {
+            Log.i("ManualUpdate", "Sending " + intent.getExtras().getInt("WidgetID"));
             Intent serviceIntent = new Intent(context, UpdateService.class);
             serviceIntent.setAction("ManualUpdate");
             serviceIntent.putExtra("WidgetID", intent.getExtras().getInt("WidgetID"));
             context.startService(serviceIntent);
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget);
             views.setViewVisibility(R.id.loadingCircle, View.VISIBLE);
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            appWidgetManager.updateAppWidget(intent.getExtras().getInt("WidgetID"), views);
         }
     }
 
     static void updateWidgetData(Context context, RemoteViews remoteViews, String updateData) {
-        WidgetData w = UpdateService.currentService.getWidgetData(updateID);
+        DataWriter dw = new DataWriter(context);
+        WidgetData w = dw.loadWidgetData(updateID);
+        Log.e("WidgetUpdateData", "DATA: " + updateData);
+        if (w == null) {
+            Log.e("AppWidget", "Widget data is null!");
+            return;
+        }
         // Check for timeout
         if (checkTimeout) {
             if (w != null && w.timeoutAlert && w.timeoutTries - 1 >= w.timeoutAlertThreshold && (!w.timeoutAlerted || w.repeatTimeout)) {
@@ -135,15 +144,14 @@ public class AppWidget extends AppWidgetProvider {
             }
             // Write widget data
             if (w != null) {
-                DataWriter dw = new DataWriter(context);
                 dw.saveWidgetData(w, true);
             }
             return;
         }
         setAllColor(remoteViews, Color.WHITE);
         // Loading circle
-        Log.e("DATA", updateData);
-        //remoteViews.setViewVisibility(R.id.loadingCircle, View.GONE);
+        //Log.e("DATA", updateData);
+        remoteViews.setViewVisibility(R.id.loadingCircle, View.GONE);
 
         // Update widgetData object
 
@@ -151,7 +159,7 @@ public class AppWidget extends AppWidgetProvider {
         String[] fieldNames = new String[8];
         String[] fieldValues = new String[8];
         processData(context, updateData, fieldNames, fieldValues);
-        UpdateService.currentService.setWidgetData(updateID, updateData, fieldValues);
+
 
         // Check for meta data alert
         if (w != null && w.metaAlert && (!w.metaAlerted || w.repeatMeta)) {
@@ -224,7 +232,6 @@ public class AppWidget extends AppWidgetProvider {
 
         // Write widget data
         if (w != null) {
-            DataWriter dw = new DataWriter(context);
             dw.saveWidgetData(w, true);
         }
     }
@@ -322,7 +329,6 @@ public class AppWidget extends AppWidgetProvider {
         // Remove all deleted widgets
         for (int id : appWidgetIds) {
             DataWriter dw = new DataWriter(context, id);
-            //UpdateService.currentService.removeWidget(null, context, id);
         }
     }
 

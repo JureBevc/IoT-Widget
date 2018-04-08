@@ -138,7 +138,9 @@ public class UpdateService extends Service {
     }
 
     void manualUpdate(int widgetID) {
+        loadWidgetData(null);
         Log.i("Service", "Manual update (" + widgetData.size() + ")");
+        Log.i("INFO", "ID: " + widgetID + " " + widgetData.getFirst().widgetID);
         for (int i = 0; i < widgetData.size(); i++) {
             WidgetData w = widgetData.get(i);
             if (w == null || w.widgetID != widgetID) continue;

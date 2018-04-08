@@ -45,6 +45,45 @@ public class DataWriter {
         editor.apply();
     }
 
+    public WidgetData loadWidgetData(int widgetID) {
+        SharedPreferences prefs = sharedPreferences;
+        WidgetData w = new WidgetData();
+        w.widgetID = widgetID;
+
+        w.Channel_ID = prefs.getString("channel_" + w.widgetID, "");
+        w.API_Key = prefs.getString("api_" + w.widgetID, "");
+        w.serverURL = prefs.getString("server_" + w.widgetID, "");
+        w.ChannelName = prefs.getString("name_" + w.widgetID, "");
+
+        w.updateInterval = prefs.getInt("updateInterval_" + w.widgetID, 0);
+        w.currentUpdateTime = prefs.getInt("currentUpdateTime_" + w.widgetID, 0);
+        w.setDecimalPlaces(prefs.getString("decimalPlaces_" + w.widgetID, ""));
+
+        w.netFail = prefs.getBoolean("netFail_" + w.widgetID, false);
+        w.timeoutTries = prefs.getInt("timeoutTries_" + w.widgetID, 0);
+        w.timeoutAlert = prefs.getBoolean("timeoutAlert_" + w.widgetID, false);
+        w.timeoutAlertThreshold = prefs.getInt("timeoutAlertThreshold_" + w.widgetID, 0);
+
+        w.metaAlert = prefs.getBoolean("metaAlert_" + w.widgetID, false);
+        w.metaAlertString = prefs.getString("metaAlertString_" + w.widgetID, "");
+
+        w.repeatTimeout = prefs.getBoolean("repeatTimeout_" + w.widgetID, false);
+        w.timeoutAlerted = prefs.getBoolean("timeoutAlerted_" + w.widgetID, false);
+        w.repeatMeta = prefs.getBoolean("repeatMeta_" + w.widgetID, false);
+        w.metaAlerted = prefs.getBoolean("metaAlerted_" + w.widgetID, false);
+        w.setRepeatBounds(prefs.getString("repeatBounds_" + w.widgetID, ""));
+        w.setBoundsAlerted(prefs.getString("boundsAlerted_" + w.widgetID, ""));
+
+
+        w.setBounds(prefs.getString("upperBoundAlert_" + w.widgetID, ""),
+                prefs.getString("lowerBoundAlert_" + w.widgetID, ""),
+                prefs.getString("upperBound_" + w.widgetID, ""),
+                prefs.getString("lowerBound_" + w.widgetID, ""));
+
+        w.setFieldsInOrder(prefs.getString("fieldsInOrder_" + w.widgetID, ""));
+        return w;
+    }
+
     public void saveWidgetData(WidgetData w, boolean allData) {
 
         String all_ids = sharedPreferences.getString("all_ids", "");

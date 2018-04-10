@@ -123,7 +123,7 @@ public class UpdateService extends Service {
         loadWidgetData(null);
 
         if (intent != null && intent.getAction() != null && intent.getAction().equals("ManualUpdate")) {
-            manualUpdate(intent.getExtras().getInt("WidgetID"));
+            manualUpdate(intent.getExtras().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID));
         } else {
             updateWidgets();
         }

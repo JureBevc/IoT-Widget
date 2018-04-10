@@ -41,7 +41,7 @@ public class AppWidget extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
-        Log.e("Updating widget", "" + appWidgetId);
+        //Log.e("Updating widget", "" + appWidgetId);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget);
 
@@ -60,8 +60,8 @@ public class AppWidget extends AppWidgetProvider {
         // Refresh button
         Intent intent = new Intent(context, AppWidget.class);
         intent.setAction("ManualUpdate");
-        intent.putExtra("WidgetID", appWidgetId);
-        PendingIntent refreshIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        PendingIntent refreshIntent = PendingIntent.getBroadcast(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.DateAndTimeText, refreshIntent);
 
         // Open App button on channel
@@ -113,22 +113,23 @@ public class AppWidget extends AppWidgetProvider {
 
             }
         } else if (action.equals("ManualUpdate")) {
-            Log.i("ManualUpdate", "Sending " + intent.getExtras().getInt("WidgetID"));
+            int wid = intent.getExtras().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+            Log.i("ManualUpdate", "Sending " + wid);
             Intent serviceIntent = new Intent(context, UpdateService.class);
             serviceIntent.setAction("ManualUpdate");
-            serviceIntent.putExtra("WidgetID", intent.getExtras().getInt("WidgetID"));
+            serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, wid);
             context.startService(serviceIntent);
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget);
             views.setViewVisibility(R.id.loadingCircle, View.VISIBLE);
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            appWidgetManager.updateAppWidget(intent.getExtras().getInt("WidgetID"), views);
+            appWidgetManager.updateAppWidget(wid, views);
         }
     }
 
     static void updateWidgetData(Context context, RemoteViews remoteViews, String updateData) {
         DataWriter dw = new DataWriter(context);
         WidgetData w = dw.loadWidgetData(updateID);
-        Log.e("WidgetUpdateData", "DATA: " + updateData);
+        //Log.e("WidgetUpdateData", "DATA: " + updateData);
         if (w == null) {
             Log.e("AppWidget", "Widget data is null!");
             return;

@@ -9,10 +9,6 @@ import android.util.Log;
 
 import layout.AppWidget;
 
-/**
- * Created by Jure on 26/03/2018.
- */
-
 public class DataWriter {
 
     SharedPreferences sharedPreferences;

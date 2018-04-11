@@ -85,7 +85,7 @@ public class AppWidget extends AppWidgetProvider {
         super.onReceive(context, intent);
         //Log.e("onRecieve", "Widget got something " + intent.toString() + " " + intent.getAction());
         String action = intent.getAction();
-        Log.e("RECIEVED INTENT", "ACTION: " + action);
+        //Log.e("RECIEVED INTENT", "ACTION: " + action);
         // Update
         if (action.equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
             Bundle extras = intent.getExtras();

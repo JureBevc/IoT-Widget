@@ -39,43 +39,122 @@ import layout.AppWidget;
 
 public class MainActivity extends Activity {
 
-    private String Channel_ID = "", API_Key = "", serverURL = "http://api.thingspeak.com";
-    private int updateInterval = 1;
+    /*
+        This activity handles the input of the user data and starts
+        the update service for each individual widget.
+     */
+
 
     UpdateService updateService;
     DataWriter writer;
     Intent serviceIntent;
 
+    // Server data
+    private String Channel_ID = "", API_Key = "", serverURL = "http://api.thingspeak.com";
+
+    // Update frequency in minutes
+    private int updateInterval = 1;
+
+    // Data we get from server
     String updateData = "";
 
+    // The id of the current widget
     int id;
-    Intent resultValue;
 
+    // An array of empty strings used to reset field values
     String[] empty = {"", "", "", "", "", "", "", ""};
 
-    boolean timeoutAlert = false;
-    boolean timeoutRepeat = false;
-    int timeoutAlertMinutes = 0;
+    // Timeout data
+    boolean timeoutAlert = false; // Is timeout alert on
+    boolean timeoutRepeat = false; // Is it on repeat
+    int timeoutAlertMinutes = 0; // How many minutes of timeout before we alert
 
-    boolean metaAlert = false;
-    boolean metaRepeat = false;
-    String metaAlertString = "";
+    // Alerts through meta data
+    boolean metaAlert = false; // Is meta alert on
+    boolean metaRepeat = false; // Is it on repeat
+    String metaAlertString = ""; // The string that triggers the alert
 
+    // Repeat values for all 8 fields
     boolean[] alertRepeat = new boolean[8];
 
+    // The data object of the current widget
     WidgetData currentWidgetData;
+
+
+    // Fields, spinners and switches of all options
+    Spinner[] spinners = new Spinner[]{
+            findViewById(R.id.spinner1),
+            findViewById(R.id.spinner2),
+            findViewById(R.id.spinner3),
+            findViewById(R.id.spinner4),
+            findViewById(R.id.spinner5),
+            findViewById(R.id.spinner6),
+            findViewById(R.id.spinner7),
+            findViewById(R.id.spinner8)
+    };
+    EditText[] upperText = new EditText[]{
+            findViewById(R.id.upperAlert1),
+            findViewById(R.id.upperAlert2),
+            findViewById(R.id.upperAlert3),
+            findViewById(R.id.upperAlert4),
+            findViewById(R.id.upperAlert5),
+            findViewById(R.id.upperAlert6),
+            findViewById(R.id.upperAlert7),
+            findViewById(R.id.upperAlert8)
+    };
+    EditText[] lowerText = new EditText[]{
+            findViewById(R.id.lowerAlert1),
+            findViewById(R.id.lowerAlert2),
+            findViewById(R.id.lowerAlert3),
+            findViewById(R.id.lowerAlert4),
+            findViewById(R.id.lowerAlert5),
+            findViewById(R.id.lowerAlert6),
+            findViewById(R.id.lowerAlert7),
+            findViewById(R.id.lowerAlert8)
+    };
+    final Switch[] repeatSwitches = {
+            findViewById(R.id.boundsRepeat1),
+            findViewById(R.id.boundsRepeat2),
+            findViewById(R.id.boundsRepeat3),
+            findViewById(R.id.boundsRepeat4),
+            findViewById(R.id.boundsRepeat5),
+            findViewById(R.id.boundsRepeat6),
+            findViewById(R.id.boundsRepeat7),
+            findViewById(R.id.boundsRepeat8)
+    };
+    EditText[] decimalText = new EditText[]{
+            findViewById(R.id.decimalPlaces1),
+            findViewById(R.id.decimalPlaces2),
+            findViewById(R.id.decimalPlaces3),
+            findViewById(R.id.decimalPlaces4),
+            findViewById(R.id.decimalPlaces5),
+            findViewById(R.id.decimalPlaces6),
+            findViewById(R.id.decimalPlaces7),
+            findViewById(R.id.decimalPlaces8)
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Create the data writer
         writer = new DataWriter(this);
+
+        // Create the update service
         updateService = new UpdateService(this);
+
+        // Get the id of current widget
         getIdOfCurrentWidget(savedInstanceState);
+
+        // Load the widget data of current widget
         currentWidgetData = updateService.widgetDataFromPreferences(writer.sharedPreferences, id);
-        // Set default URL
+
+        // Set default URL of server if widget does not contain a server URL
         if (currentWidgetData.serverURL.isEmpty())
             currentWidgetData.serverURL = serverURL;
+
+        // Start listeners for all input fields, buttons, etc.
         seekBarListener();
         timeoutListener();
         metaListener();
@@ -86,23 +165,31 @@ public class MainActivity extends Activity {
         fieldListSelectionListener();
         doneButtonListener();
         cancelButtonListener();
+
+        // Restore widget options from previous sessions
         setWidgetOptions();
     }
 
+    // Restores widget options from previous sessions
     void setWidgetOptions() {
         WidgetData w = currentWidgetData;
         if (w != null) {
+
+            // Restore channel id
             Channel_ID = w.Channel_ID;
             final EditText channelInput = findViewById(R.id.ChannelID);
             channelInput.setText(w.Channel_ID);
 
+            // Restore API Key
             API_Key = w.API_Key;
             final EditText apiInput = findViewById(R.id.APIKey);
             apiInput.setText(w.API_Key);
 
+            // Restore update frequency bar
             final SeekBar updateIntervalBar = findViewById(R.id.UpdateTimeBar);
             updateIntervalBar.setProgress(w.updateInterval - 1);
 
+            // Restore timeout alert options
             final Switch timeoutAlert = findViewById(R.id.timeoutAlertSwitch);
             timeoutAlert.setChecked(w.timeoutAlert);
             final Switch timeoutAlertRepeat = findViewById(R.id.repeatTimeoutAlert);
@@ -110,6 +197,7 @@ public class MainActivity extends Activity {
             final SeekBar timeoutAlertDelay = findViewById(R.id.timoutSeeker);
             timeoutAlertDelay.setProgress(w.timeoutAlertThreshold);
 
+            // Restore meta alert options
             final Switch metaAlert = findViewById(R.id.metaAlertSwitch);
             metaAlert.setChecked(w.metaAlert);
             final Switch repeatMeta = findViewById(R.id.repeatMetaAlert);
@@ -117,61 +205,12 @@ public class MainActivity extends Activity {
             final EditText metaString = findViewById(R.id.metaAlertInput);
             metaString.setText(w.metaAlertString);
 
+            // Restore server URL
             final EditText serverURL = findViewById(R.id.serverURLInput);
             serverURL.setText(w.serverURL);
 
-            // Field data
-            Spinner[] spinners = new Spinner[]{
-                    findViewById(R.id.spinner1),
-                    findViewById(R.id.spinner2),
-                    findViewById(R.id.spinner3),
-                    findViewById(R.id.spinner4),
-                    findViewById(R.id.spinner5),
-                    findViewById(R.id.spinner6),
-                    findViewById(R.id.spinner7),
-                    findViewById(R.id.spinner8)
-            };
-            EditText[] upperText = new EditText[]{
-                    findViewById(R.id.upperAlert1),
-                    findViewById(R.id.upperAlert2),
-                    findViewById(R.id.upperAlert3),
-                    findViewById(R.id.upperAlert4),
-                    findViewById(R.id.upperAlert5),
-                    findViewById(R.id.upperAlert6),
-                    findViewById(R.id.upperAlert7),
-                    findViewById(R.id.upperAlert8)
-            };
-            EditText[] lowerText = new EditText[]{
-                    findViewById(R.id.lowerAlert1),
-                    findViewById(R.id.lowerAlert2),
-                    findViewById(R.id.lowerAlert3),
-                    findViewById(R.id.lowerAlert4),
-                    findViewById(R.id.lowerAlert5),
-                    findViewById(R.id.lowerAlert6),
-                    findViewById(R.id.lowerAlert7),
-                    findViewById(R.id.lowerAlert8)
-            };
-            final Switch[] repeatSwitches = {
-                    findViewById(R.id.boundsRepeat1),
-                    findViewById(R.id.boundsRepeat2),
-                    findViewById(R.id.boundsRepeat3),
-                    findViewById(R.id.boundsRepeat4),
-                    findViewById(R.id.boundsRepeat5),
-                    findViewById(R.id.boundsRepeat6),
-                    findViewById(R.id.boundsRepeat7),
-                    findViewById(R.id.boundsRepeat8)
-            };
-            EditText[] decimalText = new EditText[]{
-                    findViewById(R.id.decimalPlaces1),
-                    findViewById(R.id.decimalPlaces2),
-                    findViewById(R.id.decimalPlaces3),
-                    findViewById(R.id.decimalPlaces4),
-                    findViewById(R.id.decimalPlaces5),
-                    findViewById(R.id.decimalPlaces6),
-                    findViewById(R.id.decimalPlaces7),
-                    findViewById(R.id.decimalPlaces8)
-            };
 
+            // Restore options of all 8 fields
             for (int i = 0; i < 8; i++) {
                 int selection = (w.fieldsInOrder[i] >= 0) ? w.fieldsInOrder[i] : 0;
                 spinners[i].setSelection(selection);
@@ -183,16 +222,17 @@ public class MainActivity extends Activity {
                     decimalText[i].setText(w.decimalPlaces[i] + "");
                 repeatSwitches[i].setChecked(w.repeatBounds[i]);
             }
-            //setData();
         }
     }
 
+    // Sets the listener for meta alert options
     void metaListener() {
-        // Switch
+        // On/off switch
         final Switch metaSwitch = findViewById(R.id.metaAlertSwitch);
         final LinearLayout metaInputLayer = findViewById(R.id.metaAlertInputLayer);
         metaSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // Make the options visible only when checked
                 if (isChecked) {
                     metaInputLayer.setVisibility(View.VISIBLE);
                     metaAlert = true;
@@ -203,7 +243,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Input text
+        // Input trigger stirng
         final EditText timeoutSeeker = findViewById(R.id.metaAlertInput);
 
         timeoutSeeker.addTextChangedListener(new TextWatcher() {
@@ -218,7 +258,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Repeat
+        // Repeat switch
         final Switch metaAlertRepeat = findViewById(R.id.repeatMetaAlert);
         metaAlertRepeat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -310,16 +350,6 @@ public class MainActivity extends Activity {
     }
 
     void fieldListSelectionListener() {
-        Spinner[] spinners = new Spinner[]{
-                findViewById(R.id.spinner1),
-                findViewById(R.id.spinner2),
-                findViewById(R.id.spinner3),
-                findViewById(R.id.spinner4),
-                findViewById(R.id.spinner5),
-                findViewById(R.id.spinner6),
-                findViewById(R.id.spinner7),
-                findViewById(R.id.spinner8)
-        };
         final LinearLayout[] fieldOptions = new LinearLayout[]{
                 findViewById(R.id.fieldOptions1),
                 findViewById(R.id.fieldOptions2),
@@ -359,11 +389,6 @@ public class MainActivity extends Activity {
         Intent intent = getIntent();
         id = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
-
-        // make the result intent and set the result to canceled
-        resultValue = new Intent();
-        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
-        setResult(RESULT_CANCELED, resultValue);
 
         Log.e("Widget ID", "" + id);
         // if we weren't started properly, finish here
@@ -500,17 +525,6 @@ public class MainActivity extends Activity {
                 newFieldList[i] = i + fieldNames[i - 1];
             }
         }
-        Spinner[] spinners = new Spinner[]{
-                findViewById(R.id.spinner1),
-                findViewById(R.id.spinner2),
-                findViewById(R.id.spinner3),
-                findViewById(R.id.spinner4),
-                findViewById(R.id.spinner5),
-                findViewById(R.id.spinner6),
-                findViewById(R.id.spinner7),
-                findViewById(R.id.spinner8)
-        };
-
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
                 (this, android.R.layout.simple_spinner_item, newFieldList);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -528,16 +542,6 @@ public class MainActivity extends Activity {
     // Returns selected fields in order
     public int[] getFields() {
         int[] fields = {-1, -1, -1, -1, -1, -1, -1, -1};
-        Spinner[] spinners = new Spinner[]{
-                findViewById(R.id.spinner1),
-                findViewById(R.id.spinner2),
-                findViewById(R.id.spinner3),
-                findViewById(R.id.spinner4),
-                findViewById(R.id.spinner5),
-                findViewById(R.id.spinner6),
-                findViewById(R.id.spinner7),
-                findViewById(R.id.spinner8)
-        };
         for (int i = 0; i < 8; i++) {
             Spinner s = spinners[i];
             if (s != null && s.getSelectedItemPosition() != 0) {
@@ -555,36 +559,6 @@ public class MainActivity extends Activity {
     boolean[] repeat = new boolean[8];
 
     public void setAlerts() {
-        Spinner[] spinners = new Spinner[]{
-                findViewById(R.id.spinner1),
-                findViewById(R.id.spinner2),
-                findViewById(R.id.spinner3),
-                findViewById(R.id.spinner4),
-                findViewById(R.id.spinner5),
-                findViewById(R.id.spinner6),
-                findViewById(R.id.spinner7),
-                findViewById(R.id.spinner8)
-        };
-        EditText[] lowerText = new EditText[]{
-                findViewById(R.id.lowerAlert1),
-                findViewById(R.id.lowerAlert2),
-                findViewById(R.id.lowerAlert3),
-                findViewById(R.id.lowerAlert4),
-                findViewById(R.id.lowerAlert5),
-                findViewById(R.id.lowerAlert6),
-                findViewById(R.id.lowerAlert7),
-                findViewById(R.id.lowerAlert8)
-        };
-        EditText[] upperText = new EditText[]{
-                findViewById(R.id.upperAlert1),
-                findViewById(R.id.upperAlert2),
-                findViewById(R.id.upperAlert3),
-                findViewById(R.id.upperAlert4),
-                findViewById(R.id.upperAlert5),
-                findViewById(R.id.upperAlert6),
-                findViewById(R.id.upperAlert7),
-                findViewById(R.id.upperAlert8)
-        };
         for (int i = 0; i < 8; i++) {
             Spinner s = spinners[i];
             if (s != null && s.getSelectedItemPosition() != 0) {
@@ -619,27 +593,6 @@ public class MainActivity extends Activity {
     int decimals[] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
     public void setDecimals() {
-        Spinner[] spinners = new Spinner[]{
-                findViewById(R.id.spinner1),
-                findViewById(R.id.spinner2),
-                findViewById(R.id.spinner3),
-                findViewById(R.id.spinner4),
-                findViewById(R.id.spinner5),
-                findViewById(R.id.spinner6),
-                findViewById(R.id.spinner7),
-                findViewById(R.id.spinner8)
-        };
-        EditText[] decimalText = new EditText[]{
-                findViewById(R.id.decimalPlaces1),
-                findViewById(R.id.decimalPlaces2),
-                findViewById(R.id.decimalPlaces3),
-                findViewById(R.id.decimalPlaces4),
-                findViewById(R.id.decimalPlaces5),
-                findViewById(R.id.decimalPlaces6),
-                findViewById(R.id.decimalPlaces7),
-                findViewById(R.id.decimalPlaces8)
-        };
-
         for (int i = 0; i < 8; i++) {
             Spinner s = spinners[i];
             if (s != null && s.getSelectedItemPosition() != 0) {

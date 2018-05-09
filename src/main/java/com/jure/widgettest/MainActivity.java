@@ -72,7 +72,6 @@ public class MainActivity extends Activity {
     // Alerts through meta data
     boolean metaAlert = false; // Is meta alert on
     boolean metaRepeat = false; // Is it on repeat
-    String metaAlertString = ""; // The string that triggers the alert
 
     // Repeat values for all 8 fields
     boolean[] alertRepeat = new boolean[8];
@@ -82,56 +81,11 @@ public class MainActivity extends Activity {
 
 
     // Fields, spinners and switches of all options
-    Spinner[] spinners = new Spinner[]{
-            findViewById(R.id.spinner1),
-            findViewById(R.id.spinner2),
-            findViewById(R.id.spinner3),
-            findViewById(R.id.spinner4),
-            findViewById(R.id.spinner5),
-            findViewById(R.id.spinner6),
-            findViewById(R.id.spinner7),
-            findViewById(R.id.spinner8)
-    };
-    EditText[] upperText = new EditText[]{
-            findViewById(R.id.upperAlert1),
-            findViewById(R.id.upperAlert2),
-            findViewById(R.id.upperAlert3),
-            findViewById(R.id.upperAlert4),
-            findViewById(R.id.upperAlert5),
-            findViewById(R.id.upperAlert6),
-            findViewById(R.id.upperAlert7),
-            findViewById(R.id.upperAlert8)
-    };
-    EditText[] lowerText = new EditText[]{
-            findViewById(R.id.lowerAlert1),
-            findViewById(R.id.lowerAlert2),
-            findViewById(R.id.lowerAlert3),
-            findViewById(R.id.lowerAlert4),
-            findViewById(R.id.lowerAlert5),
-            findViewById(R.id.lowerAlert6),
-            findViewById(R.id.lowerAlert7),
-            findViewById(R.id.lowerAlert8)
-    };
-    final Switch[] repeatSwitches = {
-            findViewById(R.id.boundsRepeat1),
-            findViewById(R.id.boundsRepeat2),
-            findViewById(R.id.boundsRepeat3),
-            findViewById(R.id.boundsRepeat4),
-            findViewById(R.id.boundsRepeat5),
-            findViewById(R.id.boundsRepeat6),
-            findViewById(R.id.boundsRepeat7),
-            findViewById(R.id.boundsRepeat8)
-    };
-    EditText[] decimalText = new EditText[]{
-            findViewById(R.id.decimalPlaces1),
-            findViewById(R.id.decimalPlaces2),
-            findViewById(R.id.decimalPlaces3),
-            findViewById(R.id.decimalPlaces4),
-            findViewById(R.id.decimalPlaces5),
-            findViewById(R.id.decimalPlaces6),
-            findViewById(R.id.decimalPlaces7),
-            findViewById(R.id.decimalPlaces8)
-    };
+    Spinner[] spinners;
+    EditText[] upperText;
+    EditText[] lowerText;
+    Switch[] repeatSwitches;
+    EditText[] decimalText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +108,9 @@ public class MainActivity extends Activity {
         if (currentWidgetData.serverURL.isEmpty())
             currentWidgetData.serverURL = serverURL;
 
+        //
+        initUI();
+
         // Start listeners for all input fields, buttons, etc.
         seekBarListener();
         timeoutListener();
@@ -168,6 +125,60 @@ public class MainActivity extends Activity {
 
         // Restore widget options from previous sessions
         setWidgetOptions();
+    }
+
+    void initUI() {
+        // Fields, spinners and switches of all options
+        spinners = new Spinner[]{
+                findViewById(R.id.spinner1),
+                findViewById(R.id.spinner2),
+                findViewById(R.id.spinner3),
+                findViewById(R.id.spinner4),
+                findViewById(R.id.spinner5),
+                findViewById(R.id.spinner6),
+                findViewById(R.id.spinner7),
+                findViewById(R.id.spinner8)
+        };
+        upperText = new EditText[]{
+                findViewById(R.id.upperAlert1),
+                findViewById(R.id.upperAlert2),
+                findViewById(R.id.upperAlert3),
+                findViewById(R.id.upperAlert4),
+                findViewById(R.id.upperAlert5),
+                findViewById(R.id.upperAlert6),
+                findViewById(R.id.upperAlert7),
+                findViewById(R.id.upperAlert8)
+        };
+        lowerText = new EditText[]{
+                findViewById(R.id.lowerAlert1),
+                findViewById(R.id.lowerAlert2),
+                findViewById(R.id.lowerAlert3),
+                findViewById(R.id.lowerAlert4),
+                findViewById(R.id.lowerAlert5),
+                findViewById(R.id.lowerAlert6),
+                findViewById(R.id.lowerAlert7),
+                findViewById(R.id.lowerAlert8)
+        };
+        repeatSwitches = new Switch[]{
+                findViewById(R.id.boundsRepeat1),
+                findViewById(R.id.boundsRepeat2),
+                findViewById(R.id.boundsRepeat3),
+                findViewById(R.id.boundsRepeat4),
+                findViewById(R.id.boundsRepeat5),
+                findViewById(R.id.boundsRepeat6),
+                findViewById(R.id.boundsRepeat7),
+                findViewById(R.id.boundsRepeat8)
+        };
+        decimalText = new EditText[]{
+                findViewById(R.id.decimalPlaces1),
+                findViewById(R.id.decimalPlaces2),
+                findViewById(R.id.decimalPlaces3),
+                findViewById(R.id.decimalPlaces4),
+                findViewById(R.id.decimalPlaces5),
+                findViewById(R.id.decimalPlaces6),
+                findViewById(R.id.decimalPlaces7),
+                findViewById(R.id.decimalPlaces8)
+        };
     }
 
     // Restores widget options from previous sessions
@@ -202,8 +213,6 @@ public class MainActivity extends Activity {
             metaAlert.setChecked(w.metaAlert);
             final Switch repeatMeta = findViewById(R.id.repeatMetaAlert);
             repeatMeta.setChecked(w.repeatMeta);
-            final EditText metaString = findViewById(R.id.metaAlertInput);
-            metaString.setText(w.metaAlertString);
 
             // Restore server URL
             final EditText serverURL = findViewById(R.id.serverURLInput);
@@ -243,20 +252,6 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Input trigger stirng
-        final EditText timeoutSeeker = findViewById(R.id.metaAlertInput);
-
-        timeoutSeeker.addTextChangedListener(new TextWatcher() {
-            public void afterTextChanged(Editable s) {
-                metaAlertString = timeoutSeeker.getText().toString();
-            }
-
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-        });
 
         // Repeat switch
         final Switch metaAlertRepeat = findViewById(R.id.repeatMetaAlert);
@@ -583,7 +578,7 @@ public class MainActivity extends Activity {
             w.setLowerBound(lowerBoundSet.clone(), lowerBoundValue.clone());
             w.setUpperBound(upperBoundSet.clone(), upperBoundValue.clone());
             w.setTimeoutAlert(timeoutAlert, timeoutAlertMinutes);
-            w.setMetaAlert(metaAlert, metaAlertString);
+            w.setMetaAlert(metaAlert);
             w.setBoundsRepeat(alertRepeat);
             w.repeatTimeout = timeoutRepeat;
             w.repeatMeta = metaRepeat;

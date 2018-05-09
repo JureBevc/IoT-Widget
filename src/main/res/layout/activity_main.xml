@@ -5,8 +5,10 @@
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
                                              android:background="@color/appBackground"
-                                             tools:context="com.jure.widgettest.MainActivity"
-                                             android:focusable="true" android:focusableInTouchMode="true">
+                                             android:focusable="true"
+                                             android:focusableInTouchMode="true"
+                                             android:orientation="vertical"
+                                             tools:context="com.jure.widgettest.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -375,7 +377,7 @@
                     android:visibility="gone">
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:orientation="horizontal">
 
@@ -384,20 +386,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:maxWidth="10dp"
                             android:text="Repeat"
-                            android:textSize="12sp"/>
+                            android:textSize="14sp"/>
 
-                        <EditText
-                            android:id="@+id/metaAlertInput"
-                            android:layout_width="230dp"
+                        <Space
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:ems="10"
-                            android:hint="Metadata keyword"
-                            android:inputType="textPersonName"
-                            android:textAlignment="center"
-                            android:textSize="14sp"
-                            android:visibility="visible"/>
+                            android:layout_weight="1"/>
 
                     </LinearLayout>
 
@@ -484,7 +480,7 @@
                                     android:layout_weight="1"
                                     android:text="Decimal places:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/decimalPlaces1"
@@ -512,7 +508,7 @@
                                     android:layout_weight="1"
                                     android:text="Upper threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/upperAlert1"
@@ -541,7 +537,7 @@
                                     android:layout_weight="1"
                                     android:text="Lower threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/lowerAlert1"
@@ -639,7 +635,7 @@
                                     android:layout_weight="1"
                                     android:text="Decimal places:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/decimalPlaces2"
@@ -667,7 +663,7 @@
                                     android:layout_weight="1"
                                     android:text="Upper threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/upperAlert2"
@@ -696,7 +692,7 @@
                                     android:layout_weight="1"
                                     android:text="Lower threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/lowerAlert2"
@@ -794,7 +790,7 @@
                                     android:layout_weight="1"
                                     android:text="Decimal places:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/decimalPlaces3"
@@ -822,7 +818,7 @@
                                     android:layout_weight="1"
                                     android:text="Upper threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/upperAlert3"
@@ -851,7 +847,7 @@
                                     android:layout_weight="1"
                                     android:text="Lower threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/lowerAlert3"
@@ -949,7 +945,7 @@
                                     android:layout_weight="1"
                                     android:text="Decimal places:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/decimalPlaces4"
@@ -977,7 +973,7 @@
                                     android:layout_weight="1"
                                     android:text="Upper threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/upperAlert4"
@@ -1006,7 +1002,7 @@
                                     android:layout_weight="1"
                                     android:text="Lower threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/lowerAlert4"
@@ -1104,7 +1100,7 @@
                                     android:layout_weight="1"
                                     android:text="Decimal places:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/decimalPlaces5"
@@ -1132,7 +1128,7 @@
                                     android:layout_weight="1"
                                     android:text="Upper threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/upperAlert5"
@@ -1161,7 +1157,7 @@
                                     android:layout_weight="1"
                                     android:text="Lower threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/lowerAlert5"
@@ -1260,7 +1256,7 @@
                                     android:layout_weight="1"
                                     android:text="Decimal places:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/decimalPlaces6"
@@ -1288,7 +1284,7 @@
                                     android:layout_weight="1"
                                     android:text="Upper threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/upperAlert6"
@@ -1317,7 +1313,7 @@
                                     android:layout_weight="1"
                                     android:text="Lower threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/lowerAlert6"
@@ -1416,7 +1412,7 @@
                                     android:layout_weight="1"
                                     android:text="Decimal places:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/decimalPlaces7"
@@ -1444,7 +1440,7 @@
                                     android:layout_weight="1"
                                     android:text="Upper threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/upperAlert7"
@@ -1473,7 +1469,7 @@
                                     android:layout_weight="1"
                                     android:text="Lower threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/lowerAlert7"
@@ -1571,7 +1567,7 @@
                                     android:layout_weight="1"
                                     android:text="Decimal places:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/decimalPlaces8"
@@ -1599,7 +1595,7 @@
                                     android:layout_weight="1"
                                     android:text="Upper threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/upperAlert8"
@@ -1628,7 +1624,7 @@
                                     android:layout_weight="1"
                                     android:text="Lower threshold exceeded alert:"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
 
                                 <EditText
                                     android:id="@+id/lowerAlert8"
@@ -1656,7 +1652,7 @@
                                     android:layout_weight="1"
                                     android:text="Repeat"
                                     android:textColor="@color/background_field"
-                                    android:textSize="12sp"/>
+                                    android:textSize="14sp"/>
                             </LinearLayout>
 
                         </LinearLayout>

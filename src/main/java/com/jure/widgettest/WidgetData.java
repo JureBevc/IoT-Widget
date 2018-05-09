@@ -20,7 +20,6 @@ public class WidgetData {
 
     // Meta alert variables
     public boolean metaAlert = false;
-    public String metaAlertString = "";
 
     // Alert repetition
     public boolean repeatTimeout = false;
@@ -83,9 +82,8 @@ public class WidgetData {
         timeoutAlertThreshold = value;
     }
 
-    public void setMetaAlert(boolean alert, String metaString) {
+    public void setMetaAlert(boolean alert) {
         metaAlert = alert;
-        metaAlertString = metaString;
     }
 
     public void setDecimalPlaces(int[] dec) {

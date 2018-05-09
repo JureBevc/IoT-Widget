@@ -61,7 +61,6 @@ public class DataWriter {
         w.timeoutAlertThreshold = prefs.getInt("timeoutAlertThreshold_" + w.widgetID, 0);
 
         w.metaAlert = prefs.getBoolean("metaAlert_" + w.widgetID, false);
-        w.metaAlertString = prefs.getString("metaAlertString_" + w.widgetID, "");
 
         w.repeatTimeout = prefs.getBoolean("repeatTimeout_" + w.widgetID, false);
         w.timeoutAlerted = prefs.getBoolean("timeoutAlerted_" + w.widgetID, false);
@@ -103,7 +102,6 @@ public class DataWriter {
         editor.putInt("timeoutAlertThreshold_" + w.widgetID, w.timeoutAlertThreshold);
 
         editor.putBoolean("metaAlert_" + w.widgetID, w.metaAlert);
-        editor.putString("metaAlertString_" + w.widgetID, w.metaAlertString);
 
         editor.putBoolean("repeatTimeout_" + w.widgetID, w.repeatTimeout);
         editor.putBoolean("timeoutAlerted_" + w.widgetID, w.timeoutAlerted);

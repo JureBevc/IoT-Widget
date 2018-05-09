@@ -62,7 +62,15 @@ public class AppWidget extends AppWidgetProvider {
         intent.setAction("ManualUpdate");
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         PendingIntent refreshIntent = PendingIntent.getBroadcast(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        views.setOnClickPendingIntent(R.id.DateAndTimeText, refreshIntent);
+        views.setOnClickPendingIntent(R.id.FieldLayout1, refreshIntent);
+        views.setOnClickPendingIntent(R.id.FieldLayout2, refreshIntent);
+        views.setOnClickPendingIntent(R.id.FieldLayout3, refreshIntent);
+        views.setOnClickPendingIntent(R.id.FieldLayout4, refreshIntent);
+        views.setOnClickPendingIntent(R.id.NameLayout1, refreshIntent);
+        views.setOnClickPendingIntent(R.id.NameLayout2, refreshIntent);
+        views.setOnClickPendingIntent(R.id.NameLayout3, refreshIntent);
+        views.setOnClickPendingIntent(R.id.NameLayout4, refreshIntent);
+
 
         // Open App button on channel
         views.setOnClickPendingIntent(R.id.ChannelText, pIntent);
@@ -167,8 +175,8 @@ public class AppWidget extends AppWidgetProvider {
             w.metaAlerted = true;
             try {
                 String metaData = new JSONObject(updateData).getJSONObject("channel").getString("metadata");
-                if (metaData.contains(w.metaAlertString)) {
-                    sendNotification(context, "Alert string found in matadata: " + w.metaAlertString, w.ChannelName);
+                if (!metaData.isEmpty()) {
+                    sendNotification(context, "IoT metadata: " + metaData, w.ChannelName);
                 }
             } catch (Exception e) {
                 // Error getting meta data
@@ -192,6 +200,10 @@ public class AppWidget extends AppWidgetProvider {
         int nextField = 0;
         for (int i = 0; i < 8; i++) {
             if (w.fieldsInOrder[i] != -1) {
+
+                remoteViews.setViewVisibility(fieldNameTexts[nextField], View.VISIBLE);
+                remoteViews.setViewVisibility(fieldValueTexts[nextField], View.VISIBLE);
+
                 remoteViews.setTextViewText(fieldNameTexts[nextField], fieldNames[w.fieldsInOrder[i] - 1]);
 
                 if (w.decimalPlaces[i] >= 0 && isDecimal(fieldValues[w.fieldsInOrder[i] - 1])) {
@@ -224,6 +236,8 @@ public class AppWidget extends AppWidgetProvider {
         for (int i = nextField; i < 8; i++) {
             remoteViews.setTextViewText(fieldNameTexts[i], "");
             remoteViews.setTextViewText(fieldValueTexts[i], "");
+            remoteViews.setViewVisibility(fieldNameTexts[i], View.GONE);
+            remoteViews.setViewVisibility(fieldValueTexts[i], View.GONE);
         }
 
         // Set time

@@ -34,7 +34,7 @@
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:minHeight="20dp"
+                android:minHeight="24dp"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="3"
                 android:shadowDy="3"
@@ -57,7 +57,7 @@
                 android:ellipsize="end"
                 android:gravity="end"
                 android:maxLines="1"
-                android:minHeight="20dp"
+                android:minHeight="24dp"
                 android:paddingEnd="10dp"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="3"
@@ -72,11 +72,11 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/NameLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/FieldText1"
@@ -87,15 +87,16 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignRight="@+id/Field1"
                 android:layout_below="@+id/relativeLayout"
-                android:layout_marginTop="1dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
                 android:alpha="1"
-                android:background="@color/background_field"
+                android:background="@color/background_fieldname"
                 android:backgroundTint="@color/background_field"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:minHeight="20dp"
+                android:minHeight="24dp"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="3"
                 android:shadowDy="3"
@@ -114,15 +115,16 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignStart="@+id/Field2"
-                android:layout_marginTop="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
                 android:alpha="1"
-                android:background="@color/background_field"
+                android:background="@color/background_fieldname"
                 android:backgroundTint="@color/background_field"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:minHeight="20dp"
+                android:minHeight="24dp"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="3"
                 android:shadowDy="3"
@@ -134,11 +136,11 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/FieldLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/Field1"
@@ -192,11 +194,11 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/NameLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/FieldText3"
@@ -207,15 +209,16 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignRight="@+id/Field1"
                 android:layout_below="@+id/Field1"
-                android:layout_marginTop="1dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
                 android:alpha="1"
-                android:background="@color/background_field"
+                android:background="@color/background_fieldname"
                 android:backgroundTint="@color/background_field"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:minHeight="20dp"
+                android:minHeight="15dp"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="3"
                 android:shadowDy="3"
@@ -235,15 +238,16 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignStart="@+id/Field2"
-                android:layout_marginTop="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
                 android:alpha="1"
-                android:background="@color/background_field"
+                android:background="@color/background_fieldname"
                 android:backgroundTint="@color/background_field"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:minHeight="20dp"
+                android:minHeight="15dp"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="3"
                 android:shadowDy="3"
@@ -255,11 +259,11 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/FieldLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/Field3"
@@ -313,24 +317,25 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/NameLayout3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/FieldText5"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
-                android:background="@color/background_field"
+                android:background="@color/background_fieldname"
                 android:backgroundTint="@color/background_field"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:minHeight="20dp"
+                android:minHeight="15dp"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="3"
                 android:shadowDy="3"
@@ -347,15 +352,16 @@
                 android:layout_alignEnd="@+id/Field3"
                 android:layout_alignParentStart="true"
                 android:layout_alignRight="@+id/Field3"
-                android:layout_marginTop="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
                 android:alpha="1"
-                android:background="@color/background_field"
+                android:background="@color/background_fieldname"
                 android:backgroundTint="@color/background_field"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:minHeight="20dp"
+                android:minHeight="15dp"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="3"
                 android:shadowDy="3"
@@ -367,11 +373,11 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/FieldLayout3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/Field5"
@@ -423,11 +429,11 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/NameLayout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/FieldText7"
@@ -439,15 +445,16 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignRight="@+id/Field5"
-                android:layout_marginTop="1dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
                 android:alpha="1"
-                android:background="@color/background_field"
+                android:background="@color/background_fieldname"
                 android:backgroundTint="@color/background_field"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:minHeight="20dp"
+                android:minHeight="15dp"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="3"
                 android:shadowDy="3"
@@ -466,15 +473,16 @@
                 android:layout_alignRight="@+id/Field6"
                 android:layout_alignStart="@+id/Field6"
                 android:layout_below="@+id/Field6"
-                android:layout_marginTop="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
                 android:alpha="1"
-                android:background="@color/background_field"
+                android:background="@color/background_fieldname"
                 android:backgroundTint="@color/background_field"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:minHeight="20dp"
+                android:minHeight="15dp"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="3"
                 android:shadowDy="3"
@@ -486,11 +494,11 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/FieldLayout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/Field7"

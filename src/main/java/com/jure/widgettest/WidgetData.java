@@ -8,6 +8,7 @@ public class WidgetData {
     public String ChannelName = null;
     public int updateInterval;
     public int currentUpdateTime;
+    public String latestData = "";
 
     public int decimalPlaces[] = {-1, -1, -1, -1, -1, -1, -1, -1};
 

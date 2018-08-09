@@ -7,7 +7,6 @@
                                              android:background="@color/appBackground"
                                              android:focusable="true"
                                              android:focusableInTouchMode="true"
-                                             android:orientation="vertical"
                                              tools:context="com.jure.widgettest.MainActivity">
 
     <LinearLayout

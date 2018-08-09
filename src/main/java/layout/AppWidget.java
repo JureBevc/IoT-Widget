@@ -1,5 +1,6 @@
 package layout;
 
+import android.app.ActionBar;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.jure.widgettest.DataWriter;
+import com.jure.widgettest.Graph;
 import com.jure.widgettest.MainActivity;
 import com.jure.widgettest.R;
 import com.jure.widgettest.UpdateService;
@@ -71,6 +73,12 @@ public class AppWidget extends AppWidgetProvider {
         views.setOnClickPendingIntent(R.id.NameLayout3, refreshIntent);
         views.setOnClickPendingIntent(R.id.NameLayout4, refreshIntent);
 
+        // Open graph button
+        Intent openGraph = new Intent(context, Graph.class);
+        openGraph.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        PendingIntent pGraphIntent = PendingIntent.getActivity(context, appWidgetId, openGraph,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.graphButton, pGraphIntent);
 
         // Open App button on channel
         views.setOnClickPendingIntent(R.id.ChannelText, pIntent);
@@ -141,6 +149,9 @@ public class AppWidget extends AppWidgetProvider {
         if (w == null) {
             Log.e("AppWidget", "Widget data is null!");
             return;
+        }
+        if (updateData != null && !updateData.equals("")) {
+            w.latestData = updateData;
         }
         // Check for timeout
         if (checkTimeout) {
@@ -232,6 +243,9 @@ public class AppWidget extends AppWidgetProvider {
                 nextField++;
             }
         }
+        // Change weight sum of layout
+        int rows = (int)Math.ceil(nextField / 2.0f);
+        remoteViews.setFloat(R.id.main_content, "setWeightSum", rows * 2 + rows*0.7f + 1);
         // Set empty fields
         for (int i = nextField; i < 8; i++) {
             remoteViews.setTextViewText(fieldNameTexts[i], "");

@@ -50,6 +50,7 @@ public class DataWriter {
         w.API_Key = prefs.getString("api_" + w.widgetID, "");
         w.serverURL = prefs.getString("server_" + w.widgetID, "");
         w.ChannelName = prefs.getString("name_" + w.widgetID, "");
+        w.latestData = prefs.getString("latestData_" + w.widgetID, "");
 
         w.updateInterval = prefs.getInt("updateInterval_" + w.widgetID, 0);
         w.currentUpdateTime = prefs.getInt("currentUpdateTime_" + w.widgetID, 0);
@@ -91,6 +92,7 @@ public class DataWriter {
             editor.putString("api_" + w.widgetID, w.API_Key);
             editor.putString("server_" + w.widgetID, w.serverURL);
             editor.putString("name_" + w.widgetID, w.ChannelName);
+            editor.putString("latestData_" + w.widgetID, w.latestData);
         }
         editor.putInt("updateInterval_" + w.widgetID, w.updateInterval);
         editor.putInt("currentUpdateTime_" + w.widgetID, w.currentUpdateTime);

@@ -1,5 +1,6 @@
 package com.jure.widgettest;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
@@ -8,9 +9,12 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -90,6 +94,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        permissions();
         setContentView(R.layout.activity_main);
 
         // Create the data writer
@@ -105,8 +110,9 @@ public class MainActivity extends Activity {
         currentWidgetData = updateService.widgetDataFromPreferences(writer.sharedPreferences, id);
 
         // Set default URL of server if widget does not contain a server URL
-        if (currentWidgetData.serverURL.isEmpty())
+        if (currentWidgetData.serverURL.isEmpty()) {
             currentWidgetData.serverURL = serverURL;
+        }
 
         //
         initUI();
@@ -125,6 +131,31 @@ public class MainActivity extends Activity {
 
         // Restore widget options from previous sessions
         setWidgetOptions();
+
+    }
+
+    private void permissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.VIBRATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.e("PERMISSION NOT GRANTED", "1");
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.VIBRATE},
+                        1);
+        }else
+        Log.e("PERMISSION GRANTED", "1");
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.e("PERMISSION NOT GRANTED", "2");
+            // No explanation needed; request the permission
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.INTERNET},
+                    1);
+        }else
+            Log.e("PERMISSION GRANTED", "2");
     }
 
     void initUI() {

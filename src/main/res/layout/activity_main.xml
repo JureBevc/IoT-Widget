@@ -16,7 +16,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:background="@color/done_color"
             android:orientation="horizontal">
 
@@ -30,13 +30,13 @@
                 android:text="Widget settings"
                 android:textAlignment="center"
                 android:textColor="@color/appBackground"
-                android:textSize="18sp"/>
+                android:textSize="18sp" />
 
             <Button
                 android:id="@+id/CancelButton"
                 style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="5dp"
-                android:layout_height="match_parent"
+                android:layout_width="15dp"
+                android:layout_height="50dp"
                 android:layout_margin="0dp"
                 android:layout_weight="1"
                 android:background="@drawable/cross_mark"
@@ -46,12 +46,12 @@
                 android:textAlignment="center"
                 android:textAllCaps="false"
                 android:textColor="@color/appBackground"
-                android:textSize="24sp"/>
+                android:textSize="24sp" />
 
             <Button
                 android:id="@+id/DoneButton"
-                android:layout_width="5dp"
-                android:layout_height="match_parent"
+                android:layout_width="15dp"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:background="@drawable/check_mark"
                 android:minHeight="0dp"
@@ -59,7 +59,7 @@
                 android:textAlignment="center"
                 android:textAllCaps="false"
                 android:textColor="@android:color/background_light"
-                android:textSize="24sp"/>
+                android:textSize="24sp" />
         </LinearLayout>
 
         <ScrollView

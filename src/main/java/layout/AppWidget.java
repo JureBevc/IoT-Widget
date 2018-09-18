@@ -1,6 +1,8 @@
 package layout;
 
 import android.app.ActionBar;
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -8,8 +10,10 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.view.ViewCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -81,7 +85,7 @@ public class AppWidget extends AppWidgetProvider {
         views.setOnClickPendingIntent(R.id.graphButton, pGraphIntent);
 
         // Open App button on channel
-        views.setOnClickPendingIntent(R.id.ChannelText, pIntent);
+        //views.setOnClickPendingIntent(R.id.ChannelText, pIntent);
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
@@ -134,7 +138,11 @@ public class AppWidget extends AppWidgetProvider {
             Intent serviceIntent = new Intent(context, UpdateService.class);
             serviceIntent.setAction("ManualUpdate");
             serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, wid);
-            context.startService(serviceIntent);
+            try {
+                context.startService(serviceIntent);
+            }catch(Exception e){
+                //
+            }
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget);
             views.setViewVisibility(R.id.loadingCircle, View.VISIBLE);
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
@@ -244,8 +252,8 @@ public class AppWidget extends AppWidgetProvider {
             }
         }
         // Change weight sum of layout
-        int rows = (int)Math.ceil(nextField / 2.0f);
-        remoteViews.setFloat(R.id.main_content, "setWeightSum", rows * 2 + rows*0.7f + 1);
+        int rows = (int) Math.ceil(nextField / 2.0f);
+        remoteViews.setFloat(R.id.main_content, "setWeightSum", rows * 2 + rows * 0.7f + 1);
         // Set empty fields
         for (int i = nextField; i < 8; i++) {
             remoteViews.setTextViewText(fieldNameTexts[i], "");
@@ -315,6 +323,46 @@ public class AppWidget extends AppWidgetProvider {
     }
 
     static void sendNotification(Context context, String text, String channelName) {
+        Log.i("Notification form " + channelName, text);
+        String title = "IoT Widget Alert" + ((channelName != null) ? " - " + channelName : "");
+        NotificationManager mNotificationManager;
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context.getApplicationContext(), "notify_001");
+
+        Intent ii = new Intent(context.getApplicationContext(), MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, ii, 0);
+
+        NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
+        bigText.bigText(text);
+        bigText.setBigContentTitle(title);
+        bigText.setSummaryText(text);
+
+        mBuilder.setContentIntent(pendingIntent);
+        mBuilder.setSmallIcon(R.drawable.alert_icon);
+        mBuilder.setContentTitle(title);
+        mBuilder.setContentText(text);
+        mBuilder.setStyle(bigText);
+        mBuilder.setAutoCancel(true);
+        mBuilder.setVibrate(new long[]{0, 100, 50, 100, 100});
+        mBuilder.setLights(Color.RED, 500, 1000);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            mBuilder.setPriority(Notification.PRIORITY_MAX);
+        }
+
+        mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("notify_001",
+                    "Channel human readable title",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            mNotificationManager.createNotificationChannel(channel);
+        }
+        mNotificationManager.notify(0, mBuilder.build());
+
+        /*
         NotificationCompat.Builder n = new NotificationCompat.Builder(context)
                 .setContentTitle("IoT Widget Alert" + ((channelName != null) ? " - " + channelName : ""))
                 .setContentText(text)
@@ -326,10 +374,12 @@ public class AppWidget extends AppWidgetProvider {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         try {
             notificationManager.notify(updateID, n.build());
+            Log.e("Notification", "Notification");
         } catch (Exception e) {
             Log.e("WidgetApp", "Notification error");
             e.printStackTrace();
         }
+        */
     }
 
     static void setAllColor(RemoteViews remoteViews, int color) {

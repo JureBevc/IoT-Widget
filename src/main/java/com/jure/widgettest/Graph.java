@@ -76,9 +76,9 @@ public class Graph extends Activity {
         graph = (GraphView) findViewById(R.id.graph);
         graph.setBackgroundColor(getResources().getColor(R.color.appBackground));
         graph.getViewport().setScrollable(true); // enables horizontal scrolling
-        graph.getViewport().setScrollableY(true); // enables vertical scrolling
+        graph.getViewport().setScrollableY(false); // enables vertical scrolling
         graph.getViewport().setScalable(true); // enables horizontal zooming and scrolling
-        graph.getViewport().setScalableY(true); // enables vertical zooming and scrolling
+        graph.getViewport().setScalableY(false); // enables vertical zooming and scrolling
         graph.setTitle(widgetData.ChannelName); // Title
         graph.setTitleTextSize(40);
         graph.setTitleColor(Color.parseColor("#222222"));
@@ -232,4 +232,5 @@ public class Graph extends Activity {
             });
         }
     }
+
 }

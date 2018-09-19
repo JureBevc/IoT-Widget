@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,7 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -36,7 +39,7 @@ public class Graph extends Activity {
     DataPoint[][] fieldDataPoints;
     String[] fieldNames;
 
-    int colors[] = {Color.BLUE,Color.RED, Color.GREEN, Color.MAGENTA, Color.BLACK, Color.CYAN, Color.YELLOW, Color.GRAY};
+    int colors[] = {Color.BLUE, Color.RED, Color.GREEN, Color.MAGENTA, Color.BLACK, Color.CYAN, Color.YELLOW, Color.GRAY};
 
     @SuppressWarnings("unchecked")
     LineGraphSeries<DataPoint>[] allSeries = new LineGraphSeries[8];
@@ -98,6 +101,7 @@ public class Graph extends Activity {
         });
 
         checkBoxes[0].setChecked(true);
+        hideSystemUI();
     }
 
     /**
@@ -160,6 +164,14 @@ public class Graph extends Activity {
                         }
                     }
                 }
+                for (DataPoint[] dataPoints : fieldDataPoints) {
+                    Arrays.sort(dataPoints, new Comparator<DataPoint>() {
+                        @Override
+                        public int compare(DataPoint o1, DataPoint o2) {
+                            return Double.compare(o1.getX(), o2.getX());
+                        }
+                    });
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -169,6 +181,7 @@ public class Graph extends Activity {
             e.printStackTrace();
         }
     }
+
 
     void setSeries() {
         graph.removeAllSeries();
@@ -204,7 +217,6 @@ public class Graph extends Activity {
                 }
             }
         }
-        System.out.println(minX + " " + maxX + " " + minY + " " + maxY);
         graph.getViewport().setMinX(minX);
         graph.getViewport().setMaxX(maxX);
         graph.getViewport().setMinY(minY);
@@ -231,6 +243,24 @@ public class Graph extends Activity {
                 }
             });
         }
+    }
+
+    private void hideSystemUI() {
+        // Enables regular immersive mode.
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        View decorView = getWindow().getDecorView();
+        int flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        if (Build.VERSION.SDK_INT >= 19) {
+            flags = flags | View.SYSTEM_UI_FLAG_IMMERSIVE;
+        }
+        if (Build.VERSION.SDK_INT >= 16) {
+            flags = flags | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            flags = flags | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+            flags = flags | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            flags = flags | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        }
+        decorView.setSystemUiVisibility(flags);
     }
 
 }

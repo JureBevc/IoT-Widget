@@ -24,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
@@ -506,7 +507,7 @@ public class MainActivity extends Activity {
     }
 
     public void doneButtonListener() {
-        Button doneButton = findViewById(R.id.DoneButton);
+        ImageButton doneButton = findViewById(R.id.DoneButton);
         doneButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -525,7 +526,7 @@ public class MainActivity extends Activity {
     }
 
     public void cancelButtonListener() {
-        Button cancelButton = findViewById(R.id.CancelButton);
+        ImageButton cancelButton = findViewById(R.id.CancelButton);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -644,7 +645,7 @@ public class MainActivity extends Activity {
         serviceIntent = new Intent(this, UpdateService.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, serviceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 60000, pendingIntent);
+        manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 60000, pendingIntent);
     }
 
     @Override

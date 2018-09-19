@@ -16,13 +16,14 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:background="@color/done_color"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="5">
 
             <TextView
                 android:id="@+id/textView"
-                android:layout_width="161dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
@@ -30,36 +31,33 @@
                 android:text="Widget settings"
                 android:textAlignment="center"
                 android:textColor="@color/appBackground"
-                android:textSize="18sp" />
+                android:textSize="18sp"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/CancelButton"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="15dp"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_margin="0dp"
-                android:layout_weight="1"
+                android:layout_weight="2"
+                android:adjustViewBounds="true"
                 android:background="@drawable/cross_mark"
+                android:cropToPadding="true"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:padding="0dp"
-                android:textAlignment="center"
-                android:textAllCaps="false"
-                android:textColor="@color/appBackground"
-                android:textSize="24sp" />
+                android:scaleType="fitCenter"
+                android:textAlignment="center"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/DoneButton"
-                android:layout_width="15dp"
-                android:layout_height="50dp"
-                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
                 android:background="@drawable/check_mark"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
-                android:textAlignment="center"
-                android:textAllCaps="false"
-                android:textColor="@android:color/background_light"
-                android:textSize="24sp" />
+                android:scaleType="matrix"
+                android:textAlignment="center"/>
         </LinearLayout>
 
         <ScrollView
@@ -160,10 +158,15 @@
                         android:ems="10"
                         android:foregroundTint="@color/done_color"
                         android:inputType="textPersonName"
-                        android:padding="0dp"
+                        android:paddingBottom="5dp"
+                        android:paddingLeft="0dp"
+                        android:paddingRight="0dp"
+                        android:paddingTop="0dp"
                         android:textAlignment="center"
+                        android:textAllCaps="true"
                         android:textColorLink="@android:color/holo_blue_light"
-                        android:textCursorDrawable="@null"/>
+                        android:textCursorDrawable="@null"
+                        />
 
                 </TableRow>
 

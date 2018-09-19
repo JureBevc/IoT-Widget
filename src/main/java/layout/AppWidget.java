@@ -29,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
@@ -140,7 +141,7 @@ public class AppWidget extends AppWidgetProvider {
             serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, wid);
             try {
                 context.startService(serviceIntent);
-            }catch(Exception e){
+            } catch (Exception e) {
                 //
             }
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget);
@@ -194,8 +195,10 @@ public class AppWidget extends AppWidgetProvider {
             w.metaAlerted = true;
             try {
                 String metaData = new JSONObject(updateData).getJSONObject("channel").getString("metadata");
-                if (!metaData.isEmpty()) {
-                    sendNotification(context, "IoT metadata: " + metaData, w.ChannelName);
+                metaData = "alarm: \"Alarm test!\"" + metaData;
+                String alarmString = metadataAlarmMessage(metaData);
+                if (alarmString != null && !alarmString.isEmpty()) {
+                    sendNotification(context, "IoT metadata: " + alarmString, w.ChannelName);
                 }
             } catch (Exception e) {
                 // Error getting meta data
@@ -208,7 +211,13 @@ public class AppWidget extends AppWidgetProvider {
         // Change channel name
         try {
             w.ChannelName = new JSONObject(updateData).getJSONObject("channel").getString("name");
-            remoteViews.setTextViewText(R.id.ChannelText, w.ChannelName);
+            String metaData = new JSONObject(updateData).getJSONObject("channel").getString("metadata");
+            String customName = metadataCustomName(metaData);
+            if(customName == null || customName.isEmpty()) {
+                remoteViews.setTextViewText(R.id.ChannelText, w.ChannelName);
+            }else{
+                remoteViews.setTextViewText(R.id.ChannelText, customName);
+            }
         } catch (Exception e) {
             // No channel name
         }
@@ -271,6 +280,33 @@ public class AppWidget extends AppWidgetProvider {
         if (w != null) {
             dw.saveWidgetData(w, true);
         }
+    }
+
+    static String metadataAlarmMessage(String metaData) {
+
+        int index = metaData.indexOf("alarm:");
+        if (index >= 0) {
+            String[] split1 = metaData.split("alarm:");
+            String[] split2 = split1[1].trim().split("\"");
+            if (split2.length > 1)
+                return split2[1];
+        }
+
+        return "";
+    }
+
+    static String metadataCustomName(String metaData) {
+        if(metaData == null)
+            return "";
+        int index = metaData.indexOf("name:");
+        if (index >= 0) {
+            String[] split1 = metaData.split("name:");
+            String[] split2 = split1[1].trim().split("\"");
+            if (split2.length > 1)
+                return split2[1];
+        }
+
+        return "";
     }
 
     static void processData(Context context, String updateData, String[] fieldNames, String[] fieldValues) {

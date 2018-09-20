@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.Log;
@@ -364,9 +365,9 @@ public class AppWidget extends AppWidgetProvider {
         NotificationManager mNotificationManager;
 
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context.getApplicationContext(), "notify_001");
+                new NotificationCompat.Builder(context, "notify_001");
 
-        Intent ii = new Intent(context.getApplicationContext(), MainActivity.class);
+        Intent ii = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, ii, 0);
 
         NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
@@ -374,13 +375,16 @@ public class AppWidget extends AppWidgetProvider {
         bigText.setBigContentTitle(title);
         bigText.setSummaryText(text);
 
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(500);
+
         mBuilder.setContentIntent(pendingIntent);
         mBuilder.setSmallIcon(R.drawable.alert_icon);
         mBuilder.setContentTitle(title);
         mBuilder.setContentText(text);
         mBuilder.setStyle(bigText);
         mBuilder.setAutoCancel(true);
-        mBuilder.setVibrate(new long[]{0, 100, 50, 100, 100});
+        mBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
         mBuilder.setLights(Color.RED, 500, 1000);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {

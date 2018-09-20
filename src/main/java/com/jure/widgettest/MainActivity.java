@@ -39,6 +39,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import layout.AppWidget;
 
@@ -641,11 +643,16 @@ public class MainActivity extends Activity {
     void setRepeating() {
         updateService.addWidget(writer, currentWidgetData);
         updateService.saveWidgetData(writer, currentWidgetData, true);
-        final AlarmManager manager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        serviceIntent = new Intent(this, UpdateService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, serviceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager manager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        serviceIntent = new Intent(this, AlarmTrigger.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, serviceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 60000, pendingIntent);
+        //manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 60000, pendingIntent);
+        Calendar calendar = Calendar.getInstance();
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 60000, pendingIntent);
+
+       //Calendar updateTime = Calendar.getInstance();
+       //manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, updateTime.getTimeInMillis(), 60000, pendingIntent);
     }
 
     @Override

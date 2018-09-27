@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.DefaultLabelFormatter;
@@ -23,12 +25,18 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class Graph extends Activity {
 
@@ -48,6 +56,11 @@ public class Graph extends Activity {
 
     CheckBox[] checkBoxes;
 
+    Date firstTime = null;
+
+    WidgetData widgetData;
+    Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,19 +69,31 @@ public class Graph extends Activity {
         // Create the data writer
         writer = new DataWriter(this);
 
+        // Radio button listener
+        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                RadioButton rb = (RadioButton) findViewById(checkedId);
+                changeTime(rb.getText().toString());
+            }
+        });
+
         // Get the id of current widget
         getIdOfCurrentWidget(savedInstanceState);
 
         // Load the widget data of current widget
-        WidgetData widgetData = writer.loadWidgetData(id);
-        processData(this, widgetData.latestData);
+        widgetData = writer.loadWidgetData(id);
+        context = this;
+        processData(context, widgetData.latestData);
 
         // Checkboxes
         checkboxInit();
 
         // Create series
         for (int i = 0; i < fields; i++) {
-            if (fieldDataPoints[i].length > 0) {
+            Log.e("Field " + i, "Points " + fieldDataPoints[i].length);
+            if (fieldDataPoints[i] != null && fieldDataPoints[i].length > 0) {
                 allSeries[i] = new LineGraphSeries<>(fieldDataPoints[i]);
                 allSeries[i].setTitle(fieldNames[i]);
                 allSeries[i].setDrawDataPoints(true);
@@ -91,9 +116,8 @@ public class Graph extends Activity {
             @Override
             public String formatLabel(double value, boolean isValueX) {
                 if (isValueX) {
-                    Date date = new Date((int) value);
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
-                    return sdf.format(date);
+                    Date date = new Date((long) value);
+                    return date.getHours() + ":" + date.getMinutes();
                 } else
                     return super.formatLabel(value, isValueX);
 
@@ -102,6 +126,32 @@ public class Graph extends Activity {
 
         checkBoxes[0].setChecked(true);
         hideSystemUI();
+    }
+
+    void changeTime(String text) {
+        if (text.equalsIgnoreCase("all")) {
+            firstTime = null;
+        } else if (text.equalsIgnoreCase("month")) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MONTH, -1);
+            firstTime = calendar.getTime();
+        } else if (text.equalsIgnoreCase("week")) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DATE, -7);
+            firstTime = calendar.getTime();
+        } else if (text.equalsIgnoreCase("day")) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DATE, -1);
+            firstTime = calendar.getTime();
+        } else if (text.equalsIgnoreCase("hour")) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.HOUR, -1);
+            firstTime = calendar.getTime();
+        } else {
+            firstTime = null;
+        }
+        processData(context, widgetData.latestData);
+        setSeries();
     }
 
     /**
@@ -146,31 +196,38 @@ public class Graph extends Activity {
 
             try {
                 JSONArray feeds = data.getJSONArray("feeds");
-                fieldDataPoints = new DataPoint[8][feeds.length()];
+                Log.e("FEEDS", "" + feeds.length());
+                fieldDataPoints = new DataPoint[8][];
+                List<ArrayList<DataPoint>> temp = new ArrayList<>();
+                for (int i = 0; i < 8; i++) {
+                    temp.add(new ArrayList<DataPoint>());
+                }
 
                 for (int i = 0; i < feeds.length(); i++) {
                     for (int j = 1; j <= numberOfFields; j++) {
                         try {
-                            double value = Double.parseDouble(feeds.getJSONObject(i).getString("field" + j));
-                            String time = feeds.getJSONObject(i).getString("created_at").split("T")[1];
-                            time = time.substring(0, time.length() - 1);
-                            Calendar calendar = Calendar.getInstance();
-                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
-                            calendar.setTime(sdf.parse(time));
-                            double millis = calendar.getTimeInMillis();
-                            fieldDataPoints[j - 1][i] = new DataPoint(millis, value);
+                            String numberString = feeds.getJSONObject(i).getString("field" + j);
+                            if (numberString != null && isDouble(numberString)) {
+                                double value = Double.parseDouble(numberString);
+                                String time = feeds.getJSONObject(i).getString("created_at");
+                                Calendar calendar = toCalendar(time);
+                                double millis = calendar.getTimeInMillis();
+                                if (firstTime == null || firstTime.before(calendar.getTime())) {
+                                    // fieldDataPoints[j - 1][index[j - 1]] = new DataPoint(millis, value);
+                                    temp.get(j - 1).add(new DataPoint(millis, value));
+                                }
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 }
-                for (DataPoint[] dataPoints : fieldDataPoints) {
-                    Arrays.sort(dataPoints, new Comparator<DataPoint>() {
-                        @Override
-                        public int compare(DataPoint o1, DataPoint o2) {
-                            return Double.compare(o1.getX(), o2.getX());
-                        }
-                    });
+                for (int i = 0; i < 8; i++) {
+                    if (temp.get(i).isEmpty()) {
+                        fieldDataPoints[i] = new DataPoint[0];
+                    } else {
+                        fieldDataPoints[i] = temp.get(i).toArray(new DataPoint[temp.get(i).size()]);
+                    }
                 }
 
             } catch (Exception e) {
@@ -182,6 +239,15 @@ public class Graph extends Activity {
         }
     }
 
+    private boolean isDouble(String numberString) {
+        try{
+            Double.parseDouble(numberString);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
 
     void setSeries() {
         graph.removeAllSeries();
@@ -190,7 +256,7 @@ public class Graph extends Activity {
         int ci = 0;
         for (int i = 0; i < fields; i++) {
             checkBoxes[i].setTextColor(Color.BLACK);
-            if (checkBoxes[i].isChecked()) {
+            if (checkBoxes[i].isChecked() && allSeries[i] != null) {
                 allSeries[i].setColor(colors[ci]);
                 allSeries[i].setAnimated(true);
                 checkBoxes[i].setTextColor(colors[ci]);
@@ -199,11 +265,13 @@ public class Graph extends Activity {
                 for (int j = 0; j < fieldDataPoints[i].length; j++) {
                     DataPoint d = fieldDataPoints[i][j];
                     if (!init) {
-                        init = true;
-                        minX = d.getX();
-                        maxX = d.getX();
-                        minY = d.getY();
-                        maxY = d.getY();
+                        if (d != null) {
+                            init = true;
+                            minX = d.getX();
+                            maxX = d.getX();
+                            minY = d.getY();
+                            maxY = d.getY();
+                        }
                     } else {
                         if (minX > d.getX())
                             minX = d.getX();
@@ -239,6 +307,7 @@ public class Graph extends Activity {
             checkBoxes[i].setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    processData(context, widgetData.latestData);
                     setSeries();
                 }
             });
@@ -263,4 +332,19 @@ public class Graph extends Activity {
         decorView.setSystemUiVisibility(flags);
     }
 
+
+    Calendar toCalendar(final String iso8601string) {
+        Calendar calendar = GregorianCalendar.getInstance();
+        String s = iso8601string.replace("Z", "+00:00");
+        try {
+            s = s.substring(0, 22) + s.substring(23);  // to get rid of the ":"
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            Date date = df.parse(s);
+            calendar.setTime(date);
+            return calendar;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

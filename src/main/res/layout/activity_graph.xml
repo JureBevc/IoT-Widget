@@ -10,19 +10,23 @@
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:background="@color/white"
         android:padding="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"/>
+        app:layout_constraintBottom_toTopOf="@+id/radioGroup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/linearLayout"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:background="@color/darker_back"
         android:orientation="vertical"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/radioGroup"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -108,13 +112,84 @@
             android:textColorLink="@color/done_color"
             android:visibility="invisible"/>
 
-        <ImageButton
-            android:id="@+id/imageButton"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="3dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/time_icon"/>
     </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checkedButton="@+id/allRadioButton"
+        android:layoutDirection="ltr"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <RadioButton
+            android:id="@+id/allRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:buttonTint="@color/done_color"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="All"
+            android:textColorLink="@color/done_color"/>
+
+        <RadioButton
+            android:id="@+id/monthRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:buttonTint="@color/done_color"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="Month"
+            android:textColorLink="@color/done_color"/>
+
+        <RadioButton
+            android:id="@+id/weekRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:buttonTint="@color/done_color"
+            android:text="Week"/>
+
+        <RadioButton
+            android:id="@+id/dayRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:buttonTint="@color/done_color"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="Day"
+            android:textColorLink="@color/done_color"/>
+
+        <RadioButton
+            android:id="@+id/hourRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:buttonTint="@color/done_color"
+            android:layoutDirection="ltr"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="Hour"
+            android:textColorLink="@color/done_color"
+            android:textDirection="ltr"/>
+    </RadioGroup>
 
 </android.support.constraint.ConstraintLayout>

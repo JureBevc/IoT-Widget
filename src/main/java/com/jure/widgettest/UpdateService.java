@@ -336,7 +336,7 @@ public class UpdateService extends Service {
                 Channel_ID = strings[2];
                 API_Key = strings[3];
                 isManual = Boolean.parseBoolean(strings[4]);
-                String urlString = serverURL + "/channels/" + Channel_ID + "/feed.json?metadata=true&api_key=" + API_Key;
+                String urlString = serverURL + "/channels/" + Channel_ID + "/feed.json?metadata=true&results=2000&api_key=" + API_Key;
                 //Log.e("Getting widget data", urlString);
 
                 URL url = new URL(urlString);
